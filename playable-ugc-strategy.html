@@ -30,17 +30,21 @@ body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; background:
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 60px 80px;
+  padding: 80px clamp(40px, 8vw, 120px);
   position: relative;
   overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
-@media (max-width: 768px) { .slide { padding: 40px 24px; } }
+@media (max-width: 768px) { .slide { padding: 48px 24px; } }
 
 .slide-num {
-  position: absolute; top: 30px; right: 40px;
-  font-size: 13px; font-weight: 500; color: var(--muted);
-  letter-spacing: 2px;
+  position: absolute; top: 30px; left: 80px;
+  font-size: 11px; font-weight: 500; color: var(--dim);
+  letter-spacing: 3px; text-transform: uppercase;
 }
+@media (max-width: 768px) { .slide-num { left: 24px; } }
 
 /* Title slide */
 .title-slide { text-align: left; justify-content: center; padding-left: clamp(60px, 10vw, 140px); }
@@ -55,25 +59,26 @@ h2 .num { color: var(--accent); font-family: 'DM Sans', sans-serif; font-weight:
 h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; color: var(--text); letter-spacing: -0.01em; }
 
 p { font-size: 16px; line-height: 1.75; color: var(--muted); }
-p.lead { font-size: 18px; color: var(--text); font-weight: 400; max-width: 680px; line-height: 1.7; }
+p.lead { font-size: 17px; color: var(--muted); font-weight: 400; max-width: 720px; line-height: 1.8; }
 
 /* Grid */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 32px; }
-.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-top: 32px; }
-@media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 36px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 36px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 36px; }
+.grid-2-wide { display: grid; grid-template-columns: 2fr 3fr; gap: 40px; margin-top: 36px; }
+@media (max-width: 900px) { .grid-2, .grid-3, .grid-4, .grid-2-wide { grid-template-columns: 1fr; } }
 
 /* Cards */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 28px;
+  border-radius: 6px;
+  padding: 24px 28px;
 }
-.card.accent { border-left: 4px solid var(--accent); border-color: var(--border); border-left-color: var(--accent); }
+.card.accent { border-left: 3px solid var(--accent); border-color: var(--border); border-left-color: var(--accent); background: #fdfcfa; }
 .card .icon { font-size: 32px; margin-bottom: 16px; display: block; }
-.card .num-big { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-.card .num-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.card .num-big { font-family: 'Instrument Serif', Georgia, serif; font-size: 40px; font-weight: 400; color: var(--text); margin-bottom: 2px; }
+.card .num-label { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
 
 /* Table */
 table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 14px; }
@@ -144,7 +149,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 2: EXECUTIVE SUMMARY ==================== -->
 <div class="slide" id="s2">
   <span class="slide-num">02 / 15</span>
-  <h2><span class="num">01</span> Executive Summary</h2>
+  <h2>Executive Summary</h2>
   <p class="lead">内容形态正在发生第三次跃迁。继图文到短视频之后，下一站是<strong style="color:var(--accent)">可玩体验（Playable Experience）</strong>。<br>我们称之为 <strong style="color:var(--accent)">Vibe Gaming</strong>——用自然语言创造互动内容，Vibe Coding 在游戏领域的延伸。</p>
   
   <div class="grid-3">
@@ -176,7 +181,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 3: MARKET SIZE ==================== -->
 <div class="slide" id="s3">
   <span class="slide-num">03 / 15</span>
-  <h2><span class="num">02</span> 三个市场的交叉点</h2>
+  <h2>三个市场的交叉点</h2>
   <p class="lead">游戏、H5、互动广告——三条千亿赛道正在合流，交叉点就是 Playable UGC。</p>
   
   <div class="grid-4">
@@ -219,7 +224,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 4: LOOPIT CASE STUDY ==================== -->
 <div class="slide" id="s4">
   <span class="slide-num">04 / 15</span>
-  <h2><span class="num">03</span> 行业标杆：Loopit</h2>
+  <h2>行业标杆：Loopit</h2>
   <p class="lead">第一个跑通 "Playable UGC Feed" 的产品。</p>
 
   <div class="grid-2">
@@ -278,7 +283,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 5: OUR THESIS ==================== -->
 <div class="slide" id="s5">
   <span class="slide-num">05 / 15</span>
-  <h2><span class="num">04</span> 我们的判断</h2>
+  <h2>我们的判断</h2>
   <p class="lead">Loopit 做了一个独立社区。我们要把 Vibe Gaming 做成<strong style="color:var(--accent)">超级平台的原生内容层</strong>。</p>
   
   <div class="grid-2">
@@ -318,7 +323,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 6: LAYER 1 — PLAYABLE UGC ==================== -->
 <div class="slide" id="s6">
   <span class="slide-num">06 / 15</span>
-  <h2><span class="num">05</span> Layer 1：Vibe Gaming UGC</h2>
+  <h2>Layer 1：Vibe Gaming UGC</h2>
   <p class="lead">自然语言输入，可玩体验输出。这是 Vibe Gaming 的核心循环。</p>
 
   <div class="grid-2">
@@ -370,7 +375,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 7: LAYER 2 — PUBLISHER COLLAB ==================== -->
 <div class="slide" id="s7">
   <span class="slide-num">07 / 15</span>
-  <h2><span class="num">06</span> Layer 2：厂商协同</h2>
+  <h2>Layer 2：厂商协同</h2>
   <p class="lead">Loopit 做不到的事。只有超级平台能做。</p>
 
   <div class="grid-2">
@@ -414,10 +419,10 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 8: PUBLISHER COLLAB DETAIL ==================== -->
 <div class="slide" id="s8">
   <span class="slide-num">08 / 15</span>
-  <h2><span class="num">07</span> 厂商协同：技术架构</h2>
+  <h2>厂商协同：技术架构</h2>
   
   <!-- Architecture Diagram — HTML/CSS visual -->
-  <div style="position:relative;padding:40px 32px;background:linear-gradient(135deg,#f8f8fc,#f0f0f8);border:1px solid var(--border);border-radius:16px">
+  <div style="position:relative;padding:40px 32px;background:#f5f3ef;border:1px solid var(--border);border-radius:16px">
     <!-- Title -->
     <div style="text-align:center;margin-bottom:32px">
       <span style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">PLATFORM ARCHITECTURE</span>
@@ -504,7 +509,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 9: LAYER 3 — PLAYABLE ADS ==================== -->
 <div class="slide" id="s9">
   <span class="slide-num">09 / 15</span>
-  <h2><span class="num">08</span> Layer 3：Playable 广告</h2>
+  <h2>Layer 3：Playable 广告</h2>
   <p class="lead">"可玩"成为原生内容形态之后，内容和广告的边界将消失。</p>
 
   <div class="grid-2">
@@ -549,7 +554,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 10: COMPETITIVE LANDSCAPE ==================== -->
 <div class="slide" id="s10">
   <span class="slide-num">10 / 15</span>
-  <h2><span class="num">09</span> 竞品格局</h2>
+  <h2>竞品格局</h2>
 
   <table style="background:var(--card);border-radius:16px;overflow:hidden">
     <thead>
@@ -622,7 +627,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 11: VS CLOUD GAMING ==================== -->
 <div class="slide" id="s11">
   <span class="slide-num">11 / 15</span>
-  <h2><span class="num">10</span> 为什么不是云游戏？</h2>
+  <h2>为什么不是云游戏？</h2>
   <p class="lead">看似相似，完全不同的赛道。</p>
 
   <div class="grid-2">
@@ -656,7 +661,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 12: BUSINESS MODEL ==================== -->
 <div class="slide" id="s12">
   <span class="slide-num">12 / 15</span>
-  <h2><span class="num">11</span> 商业模式</h2>
+  <h2>商业模式</h2>
 
   <div class="grid-3">
     <div class="card">
@@ -720,7 +725,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 13: ROADMAP ==================== -->
 <div class="slide" id="s13">
   <span class="slide-num">13 / 15</span>
-  <h2><span class="num">12</span> Roadmap</h2>
+  <h2>Roadmap</h2>
 
   <div class="grid-3">
     <div class="card">
@@ -768,7 +773,7 @@ tr:last-child td { border-bottom: none; }
 <!-- ==================== SLIDE 14: RISKS ==================== -->
 <div class="slide" id="s14">
   <span class="slide-num">14 / 15</span>
-  <h2><span class="num">13</span> 风险与缓解</h2>
+  <h2>风险与缓解</h2>
 
   <table style="background:var(--card);border-radius:16px;overflow:hidden">
     <thead>
