@@ -4,25 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Playable UGC — Vibe Gaming 战略方案</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --bg: #fafafa;
+  --bg: #faf9f7;
   --card: #ffffff;
-  --border: #e5e7eb;
-  --accent: #4f46e5;
-  --accent2: #7c3aed;
-  --accent3: #0891b2;
-  --green: #16a34a;
-  --orange: #ea580c;
-  --red: #dc2626;
-  --text: #18181b;
-  --muted: #71717a;
-  --dim: #d4d4d8;
+  --border: #e8e5df;
+  --accent: #c45a2d;
+  --accent2: #1a1a1a;
+  --accent3: #2563eb;
+  --green: #1a7a3a;
+  --orange: #c45a2d;
+  --red: #a82a2a;
+  --text: #1a1a1a;
+  --muted: #6b6860;
+  --dim: #c5c1b8;
 }
 html { scroll-behavior: smooth; scroll-snap-type: y mandatory; overflow-x: hidden; }
-body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
 
 .slide {
   min-height: 100vh;
@@ -43,19 +43,19 @@ body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: v
 }
 
 /* Title slide */
-.title-slide { text-align: center; justify-content: center; align-items: center; }
-.title-slide h1 { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 1.1; margin-bottom: 24px; }
-.title-slide h1 .gradient { background: linear-gradient(135deg, #4338ca, #7c3aed, #0891b2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.title-slide .subtitle { font-size: clamp(16px, 2vw, 22px); color: var(--muted); max-width: 700px; font-weight: 300; }
-.title-slide .meta { margin-top: 40px; font-size: 13px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+.title-slide { text-align: left; justify-content: center; padding-left: clamp(60px, 10vw, 140px); }
+.title-slide h1 { font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(42px, 6vw, 80px); font-weight: 400; line-height: 1.08; margin-bottom: 28px; color: var(--text); font-style: italic; }
+.title-slide h1 .gradient { color: var(--accent); -webkit-text-fill-color: var(--accent); background: none; }
+.title-slide .subtitle { font-size: clamp(16px, 1.8vw, 20px); color: var(--muted); max-width: 600px; font-weight: 400; line-height: 1.6; }
+.title-slide .meta { margin-top: 48px; font-size: 12px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
 
 /* Section headers */
-h2 { font-size: clamp(28px, 3.5vw, 48px); font-weight: 800; margin-bottom: 32px; line-height: 1.15; }
-h2 .num { color: var(--accent); font-weight: 300; font-size: 0.7em; margin-right: 8px; }
-h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+h2 { font-family: 'Instrument Serif', Georgia, serif; font-size: clamp(30px, 4vw, 52px); font-weight: 400; margin-bottom: 28px; line-height: 1.12; }
+h2 .num { color: var(--accent); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.45em; margin-right: 12px; letter-spacing: 1px; vertical-align: middle; }
+h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; color: var(--text); letter-spacing: -0.01em; }
 
-p { font-size: 16px; line-height: 1.7; color: var(--muted); }
-p.lead { font-size: 18px; color: var(--text); font-weight: 300; max-width: 800px; }
+p { font-size: 16px; line-height: 1.75; color: var(--muted); }
+p.lead { font-size: 18px; color: var(--text); font-weight: 400; max-width: 680px; line-height: 1.7; }
 
 /* Grid */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
@@ -67,11 +67,10 @@ p.lead { font-size: 18px; color: var(--text); font-weight: 300; max-width: 800px
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
 }
-.card.accent { border-color: var(--accent); background: linear-gradient(135deg, rgba(79,70,229,0.04), rgba(124,58,237,0.03)); box-shadow: 0 1px 3px rgba(79,70,229,0.08), 0 4px 16px rgba(79,70,229,0.06); }
+.card.accent { border-left: 4px solid var(--accent); border-color: var(--border); border-left-color: var(--accent); }
 .card .icon { font-size: 32px; margin-bottom: 16px; display: block; }
 .card .num-big { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .card .num-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -84,17 +83,17 @@ tr:last-child td { border-bottom: none; }
 
 /* Tags */
 .tag { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 500; margin: 2px 4px 2px 0; }
-.tag-purple { background: rgba(79,70,229,0.08); color: #4338ca; }
-.tag-green { background: rgba(22,163,74,0.08); color: #15803d; }
-.tag-orange { background: rgba(234,88,12,0.08); color: #c2410c; }
-.tag-cyan { background: rgba(8,145,178,0.08); color: #0e7490; }
-.tag-red { background: rgba(220,38,38,0.08); color: #b91c1c; }
+.tag-purple { background: #1a1a1a; color: #fff; }
+.tag-green { background: #f0f7f1; color: #1a6b35; }
+.tag-orange { background: #fdf3ee; color: #b04a22; }
+.tag-cyan { background: #eef3fb; color: #1a52a8; }
+.tag-red { background: #fdf0f0; color: #922020; }
 
 /* Highlight box */
 .highlight {
-  background: linear-gradient(135deg, rgba(79,70,229,0.04), rgba(8,145,178,0.03));
-  border: 1px solid rgba(79,70,229,0.12);
-  border-radius: 12px;
+  background: #f5f3ef;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
   padding: 24px 28px;
   margin-top: 24px;
 }
@@ -102,18 +101,18 @@ tr:last-child td { border-bottom: none; }
 
 /* Flow diagram */
 .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
-.flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 140px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; text-align: center; min-width: 140px; }
 .flow-step .label { font-size: 13px; color: var(--muted); margin-top: 6px; }
 .flow-step .val { font-size: 16px; font-weight: 600; }
-.flow-arrow { color: var(--accent); font-size: 20px; flex-shrink: 0; }
+.flow-arrow { color: var(--dim); font-size: 18px; flex-shrink: 0; }
 
 /* Quote */
-.quote { border-left: 3px solid #4f46e5; padding-left: 20px; margin: 24px 0; }
+.quote { border-left: 3px solid var(--accent); padding-left: 20px; margin: 24px 0; }
 .quote p { font-size: 17px; color: var(--text); font-style: italic; font-weight: 300; }
 .quote .attr { font-size: 13px; color: var(--muted); margin-top: 8px; font-style: normal; }
 
 /* Divider */
-.divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; margin: 24px 0; }
+.divider { width: 48px; height: 3px; background: var(--accent); border-radius: 0; margin: 24px 0; }
 
 /* Progress bar */
 .progress-bar { background: #f0f0f0; border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
@@ -122,7 +121,7 @@ tr:last-child td { border-bottom: none; }
 /* Nav dots */
 .nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; }
 .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #d4d4d8; cursor: pointer; transition: all 0.3s; border: none; }
-.nav-dot.active { background: var(--accent); transform: scale(1.4); }
+.nav-dot.active { background: var(--text); transform: scale(1.3); }
 
 /* Animate */
 .fade-in { animation: fadeIn 0.8s ease both; }
@@ -426,19 +425,19 @@ tr:last-child td { border-bottom: none; }
     
     <!-- Top Row: 3 modules -->
     <div style="display:flex;gap:16px;justify-content:center;margin-bottom:12px">
-      <div style="flex:1;max-width:200px;background:white;border:2px solid var(--accent);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(79,70,229,0.08)">
+      <div style="flex:1;max-width:200px;background:white;border:1px solid var(--border);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.02)">
         <div style="font-size:24px;margin-bottom:8px">🧠</div>
         <div style="font-size:13px;font-weight:700;color:var(--text)">AI Creation Engine</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px">Prompt → 代码生成</div>
       </div>
       <div style="display:flex;align-items:center;color:var(--accent);font-size:20px;font-weight:bold">→</div>
-      <div style="flex:1;max-width:200px;background:white;border:2px solid var(--accent2);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(124,58,237,0.08)">
+      <div style="flex:1;max-width:200px;background:white;border:1px solid var(--border);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.02)">
         <div style="font-size:24px;margin-bottom:8px">🖥️</div>
         <div style="font-size:13px;font-weight:700;color:var(--text)">Preview Sandbox</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px">iframe 沙箱实时预览</div>
       </div>
       <div style="display:flex;align-items:center;color:var(--accent);font-size:20px;font-weight:bold">→</div>
-      <div style="flex:1;max-width:200px;background:white;border:2px solid var(--accent3);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(8,145,178,0.08)">
+      <div style="flex:1;max-width:200px;background:white;border:1px solid var(--border);border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.02)">
         <div style="font-size:24px;margin-bottom:8px">📡</div>
         <div style="font-size:13px;font-weight:700;color:var(--text)">Feed 分发</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px">推荐算法 → 用户触达</div>
@@ -449,7 +448,7 @@ tr:last-child td { border-bottom: none; }
     <div style="text-align:center;color:var(--accent);font-size:18px;margin:8px 0">↕</div>
     
     <!-- Middle: Publisher SDK -->
-    <div style="background:white;border:2px solid var(--green);border-radius:12px;padding:20px 24px;margin:0 auto;max-width:640px;box-shadow:0 2px 8px rgba(22,163,74,0.08)">
+    <div style="background:white;border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin:0 auto;max-width:640px;box-shadow:0 2px 8px rgba(0,0,0,0.02)">
       <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:12px;text-align:center">Publisher SDK / Asset Pipeline</div>
       <div style="display:flex;gap:12px;justify-content:center">
         <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;text-align:center">
@@ -472,7 +471,7 @@ tr:last-child td { border-bottom: none; }
     <div style="text-align:center;color:var(--accent);font-size:18px;margin:8px 0">↕</div>
     
     <!-- Bottom: Analytics -->
-    <div style="background:white;border:2px solid var(--orange);border-radius:12px;padding:16px 24px;margin:0 auto;max-width:640px;box-shadow:0 2px 8px rgba(234,88,12,0.08)">
+    <div style="background:white;border:1px solid var(--border);border-radius:12px;padding:16px 24px;margin:0 auto;max-width:640px;box-shadow:0 2px 8px rgba(0,0,0,0.02)">
       <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
         <span style="font-size:13px;font-weight:700;color:var(--orange)">📊 Analytics</span>
         <span style="font-size:12px;color:var(--muted)">互动时长</span>
