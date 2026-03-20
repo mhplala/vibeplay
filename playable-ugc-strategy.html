@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playable UGC — Web Gaming 战略方案</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0a0a0f;
+  --card: #12121a;
+  --border: #1e1e2e;
+  --accent: #6366f1;
+  --accent2: #8b5cf6;
+  --accent3: #06b6d4;
+  --green: #22c55e;
+  --orange: #f97316;
+  --red: #ef4444;
+  --text: #e4e4e7;
+  --muted: #71717a;
+  --dim: #3f3f46;
+}
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; overflow-x: hidden; }
+body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+.slide {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 768px) { .slide { padding: 40px 24px; } }
+
+.slide-num {
+  position: absolute; top: 30px; right: 40px;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  letter-spacing: 2px;
+}
+
+/* Title slide */
+.title-slide { text-align: center; justify-content: center; align-items: center; }
+.title-slide h1 { font-size: clamp(36px, 5vw, 72px); font-weight: 900; line-height: 1.1; margin-bottom: 24px; }
+.title-slide h1 .gradient { background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.title-slide .subtitle { font-size: clamp(16px, 2vw, 22px); color: var(--muted); max-width: 700px; font-weight: 300; }
+.title-slide .meta { margin-top: 40px; font-size: 13px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+
+/* Section headers */
+h2 { font-size: clamp(28px, 3.5vw, 48px); font-weight: 800; margin-bottom: 32px; line-height: 1.15; }
+h2 .num { color: var(--accent); font-weight: 300; font-size: 0.7em; margin-right: 8px; }
+h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+
+p { font-size: 16px; line-height: 1.7; color: var(--muted); }
+p.lead { font-size: 18px; color: var(--text); font-weight: 300; max-width: 800px; }
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 32px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-top: 32px; }
+@media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+}
+.card.accent { border-color: var(--accent); background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05)); }
+.card .icon { font-size: 32px; margin-bottom: 16px; display: block; }
+.card .num-big { font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.card .num-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 14px; }
+th { text-align: left; padding: 12px 16px; font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+tr:last-child td { border-bottom: none; }
+
+/* Tags */
+.tag { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 500; margin: 2px 4px 2px 0; }
+.tag-purple { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.tag-green { background: rgba(34,197,94,0.15); color: #86efac; }
+.tag-orange { background: rgba(249,115,22,0.15); color: #fdba74; }
+.tag-cyan { background: rgba(6,182,212,0.15); color: #67e8f9; }
+.tag-red { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+/* Highlight box */
+.highlight {
+  background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.08));
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-top: 24px;
+}
+.highlight p { color: var(--text); font-size: 15px; }
+
+/* Flow diagram */
+.flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+.flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 140px; }
+.flow-step .label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.flow-step .val { font-size: 16px; font-weight: 600; }
+.flow-arrow { color: var(--accent); font-size: 20px; flex-shrink: 0; }
+
+/* Quote */
+.quote { border-left: 3px solid var(--accent); padding-left: 20px; margin: 24px 0; }
+.quote p { font-size: 17px; color: var(--text); font-style: italic; font-weight: 300; }
+.quote .attr { font-size: 13px; color: var(--muted); margin-top: 8px; font-style: normal; }
+
+/* Divider */
+.divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; margin: 24px 0; }
+
+/* Progress bar */
+.progress-bar { background: var(--border); border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; }
+
+/* Nav dots */
+.nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); cursor: pointer; transition: all 0.3s; border: none; }
+.nav-dot.active { background: var(--accent); transform: scale(1.4); }
+
+/* Animate */
+.fade-in { animation: fadeIn 0.8s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<!-- Nav dots -->
+<div class="nav-dots" id="navDots"></div>
+
+<!-- ==================== SLIDE 1: TITLE ==================== -->
+<div class="slide title-slide" id="s1">
+  <span class="slide-num">01 / 15</span>
+  <h1><span class="gradient">Playable UGC</span><br>Web Gaming 战略方案</h1>
+  <p class="subtitle">从"看视频"到"玩体验"——下一代内容平台的交互革命</p>
+  <div class="meta">Confidential · 2026.03 · Strategy Deck</div>
+</div>
+
+<!-- ==================== SLIDE 2: EXECUTIVE SUMMARY ==================== -->
+<div class="slide" id="s2">
+  <span class="slide-num">02 / 15</span>
+  <h2><span class="num">01</span> Executive Summary</h2>
+  <p class="lead">内容平台正在经历第三次形态跃迁：从图文到短视频，从短视频到<strong style="color:var(--accent)">可玩体验（Playable Experience）</strong>。</p>
+  
+  <div class="grid-3">
+    <div class="card">
+      <span class="icon">📖→📹</span>
+      <h3>第一次跃迁</h3>
+      <p>图文 → 短视频<br>2016-2020</p>
+      <p style="margin-top:8px;color:var(--text)">抖音/TikTok 验证了"所有人都能创作视频"的假设</p>
+    </div>
+    <div class="card">
+      <span class="icon">📹→🎮</span>
+      <h3>第二次跃迁</h3>
+      <p>短视频 → 可玩内容<br>2025-2026</p>
+      <p style="margin-top:8px;color:var(--text)">Loopit 验证了"所有人都能创作互动体验"的假设</p>
+    </div>
+    <div class="card accent">
+      <span class="icon">🎮+🏭</span>
+      <h3>我们的机会</h3>
+      <p>UGC + 厂商协同<br>2026-2027</p>
+      <p style="margin-top:8px;color:var(--text)">用户创作 + 厂商 IP/素材管线 = 规模化 Playable 体验</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p><strong>核心判断：</strong>Playable UGC 不是游戏赛道——它是<strong>内容形态</strong>赛道。它会像短视频替代图文一样，成为下一代 Feed 流的默认内容形式。关键不在于"做一个游戏平台"，而在于让<strong>每一条内容都可以被玩</strong>。</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 3: MARKET SIZE ==================== -->
+<div class="slide" id="s3">
+  <span class="slide-num">03 / 15</span>
+  <h2><span class="num">02</span> 市场机会</h2>
+  <p class="lead">三个市场的交叉地带，共同指向一个万亿级增量。</p>
+  
+  <div class="grid-4">
+    <div class="card">
+      <div class="num-big">$189B</div>
+      <div class="num-label">全球游戏市场 2025</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--accent)"></div></div>
+    </div>
+    <div class="card">
+      <div class="num-big">$6.0B</div>
+      <div class="num-label">HTML5 游戏市场 2026</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:32%;background:var(--accent2)"></div></div>
+    </div>
+    <div class="card">
+      <div class="num-big">$131B</div>
+      <div class="num-label">游戏内广告 2026</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:69%;background:var(--accent3)"></div></div>
+    </div>
+    <div class="card">
+      <div class="num-big">$76B</div>
+      <div class="num-label">互动广告 2024</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:var(--green)"></div></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:24px">
+    <div class="card">
+      <h3>Playable Ads 的爆发信号</h3>
+      <p>2025 年 Playable Ads 效果指数达到 191（同比 +16%），是所有广告形式中表现最好的。AppLovin 占据 59% 的 playable 流量。</p>
+      <p style="margin-top:12px;color:var(--text)">这意味着："可玩"作为交互形式，已经在广告领域被验证了 ROI 优势。接下来要做的，是把它从广告扩展到<strong>内容</strong>。</p>
+    </div>
+    <div class="card">
+      <h3>UGC 内容市场的缺口</h3>
+      <p>短视频 UGC 的供给已经饱和——内容同质化严重，创作者分成下降。平台需要新的内容形态来维持用户时长增长。</p>
+      <p style="margin-top:12px;color:var(--text)"><strong>Playable UGC 是天然的下一步</strong>：交互 = 更高留存，UGC = 无限供给，分享 = 裂变增长。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 4: LOOPIT CASE STUDY ==================== -->
+<div class="slide" id="s4">
+  <span class="slide-num">04 / 15</span>
+  <h2><span class="num">03</span> 行业标杆：Loopit</h2>
+  <p class="lead">第一个跑通"Playable UGC Feed"模型的产品。</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <h3>Loopit 是什么</h3>
+        <p style="color:var(--text)">用自然语言描述想法 → AI 生成可交互的 H5 内容（小游戏、互动 meme、quiz、模拟器、ASMR 体验）→ 在 Feed 流中分发 → 用户点击/滑动/语音/摇晃等方式互动。</p>
+        <div style="margin-top:16px">
+          <span class="tag tag-purple">AI 生成</span>
+          <span class="tag tag-green">UGC</span>
+          <span class="tag tag-cyan">全模态交互</span>
+          <span class="tag tag-orange">Feed 分发</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>核心数据</h3>
+        <table>
+          <tr><td>创始人</td><td>陈伟鹏（前搜狗研发总监、百川联合创始人）</td></tr>
+          <tr><td>融资</td><td>30 天内完成两轮，估值翻 6 倍</td></tr>
+          <tr><td>上线</td><td>2026.02.10，Musk 亲自转发</td></tr>
+          <tr><td>产品定位</td><td>"Playable TikTok"</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card accent">
+        <h3>Loopit 验证了什么</h3>
+        <div style="margin-top:16px">
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;color:var(--text)">✅ AI 能生成可玩内容</div>
+            <p style="font-size:14px;margin-top:4px">用户只需描述想法，5 分钟出成品。创作门槛和拍一条短视频差不多。</p>
+          </div>
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;color:var(--text)">✅ Feed 流是最佳分发形式</div>
+            <p style="font-size:14px;margin-top:4px">可玩内容天然适合信息流——点进去就能玩，不需要下载安装。</p>
+          </div>
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;color:var(--text)">✅ 社交裂变效果显著</div>
+            <p style="font-size:14px;margin-top:4px">互动内容的分享率远超视频——因为你要让朋友"玩一下"，而不是"看一下"。</p>
+          </div>
+          <div style="padding:12px 0">
+            <div style="font-weight:600;color:var(--text)">✅ Remix 是增长飞轮</div>
+            <p style="font-size:14px;margin-top:4px">和 TikTok 用同一首歌拍不同视频一样，Loopit 用户 remix 别人的互动内容，形成二创链条。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote">
+    <p>"我们不想把产品定义得那么窄。用户会在探索产品的过程中拓展它的边界。"</p>
+    <div class="attr">— 陈伟鹏，Loopit 创始人</div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 5: OUR THESIS ==================== -->
+<div class="slide" id="s5">
+  <span class="slide-num">05 / 15</span>
+  <h2><span class="num">04</span> 我们的判断</h2>
+  <p class="lead">Loopit 是独立社区，我们是<strong style="color:var(--accent)">超级平台的内容层</strong>。</p>
+  
+  <div class="grid-2">
+    <div class="card">
+      <h3>Loopit 的局限</h3>
+      <p style="color:var(--text)">Loopit 是一个独立 App，需要自己获客、自己建社区。它的 Playable UGC 只在自己的 Feed 里分发。</p>
+      <p style="margin-top:12px;color:var(--orange)"><strong>问题：</strong>独立社区的冷启动和增长天花板。</p>
+    </div>
+    <div class="card accent">
+      <h3>我们的优势</h3>
+      <p style="color:var(--text)">我们已经有<strong>数亿日活的 Feed 流</strong>和成熟的创作者生态。Playable UGC 不是一个新 App——它是现有内容生态的<strong>新内容形态</strong>。</p>
+      <p style="margin-top:12px;color:var(--green)"><strong>优势：</strong>即时获得海量分发和创作者供给。</p>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:32px">
+    <h3 style="margin-bottom:16px">三层战略</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="val">Layer 1</div>
+        <div class="label">Playable UGC<br><span class="tag tag-green" style="margin-top:4px">纯 UGC</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="val">Layer 2</div>
+        <div class="label">厂商协同<br><span class="tag tag-purple" style="margin-top:4px">B2B2C</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="val">Layer 3</div>
+        <div class="label">Playable 广告<br><span class="tag tag-orange" style="margin-top:4px">商业化</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 6: LAYER 1 — PLAYABLE UGC ==================== -->
+<div class="slide" id="s6">
+  <span class="slide-num">06 / 15</span>
+  <h2><span class="num">05</span> Layer 1：Playable UGC</h2>
+  <p class="lead">让每个创作者都能用自然语言生成可玩的互动体验。</p>
+
+  <div class="grid-2">
+    <div>
+      <h3>创作流程</h3>
+      <div class="flow" style="flex-direction:column;align-items:stretch">
+        <div class="flow-step" style="text-align:left">
+          <div class="val">📝 输入想法</div>
+          <div class="label">"做一个让用户投票选最好吃的火锅底料的 quiz"</div>
+        </div>
+        <div class="flow-arrow" style="text-align:center">↓</div>
+        <div class="flow-step" style="text-align:left">
+          <div class="val">⚡ AI 生成</div>
+          <div class="label">自动生成 H5 互动内容（~30 秒）</div>
+        </div>
+        <div class="flow-arrow" style="text-align:center">↓</div>
+        <div class="flow-step" style="text-align:left">
+          <div class="val">🎮 预览调整</div>
+          <div class="label">实时可玩预览，对话式修改</div>
+        </div>
+        <div class="flow-arrow" style="text-align:center">↓</div>
+        <div class="flow-step" style="text-align:left">
+          <div class="val">📤 发布到 Feed</div>
+          <div class="label">直接进入推荐流，获得分发</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>支持的体验类型</h3>
+      <div class="card" style="margin-bottom:12px">
+        <table>
+          <tr><td>🎮 小游戏</td><td>贪吃蛇、打砖块、跑酷、答题</td><td><span class="tag tag-green">高</span></td></tr>
+          <tr><td>😂 互动 Meme</td><td>点击、拖拽、摇晃触发的梗图</td><td><span class="tag tag-green">高</span></td></tr>
+          <tr><td>📊 Quiz / 投票</td><td>性格测试、知识问答、二选一</td><td><span class="tag tag-green">高</span></td></tr>
+          <tr><td>🎨 互动滤镜</td><td>AR 效果、变脸、风格迁移</td><td><span class="tag tag-cyan">中</span></td></tr>
+          <tr><td>🏗️ 模拟器</td><td>城市建造、物理沙盒</td><td><span class="tag tag-orange">低</span></td></tr>
+          <tr><td>📖 互动叙事</td><td>分支剧情、选择导向故事</td><td><span class="tag tag-cyan">中</span></td></tr>
+        </table>
+        <p style="font-size:12px;margin-top:8px;color:var(--muted)">可行性评级基于当前 AI 代码生成能力</p>
+      </div>
+
+      <div class="highlight">
+        <p style="font-size:14px"><strong>关键洞察：</strong>不要把这些叫"游戏"——叫"互动内容"或"可玩体验"。定义越窄，天花板越低。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 7: LAYER 2 — PUBLISHER COLLAB ==================== -->
+<div class="slide" id="s7">
+  <span class="slide-num">07 / 15</span>
+  <h2><span class="num">06</span> Layer 2：厂商协同</h2>
+  <p class="lead">这是 Loopit 做不到、只有超级平台能做的事。</p>
+
+  <div class="grid-2">
+    <div>
+      <h3>旧模式 vs 新模式</h3>
+      <div class="card" style="margin-bottom:16px">
+        <p style="color:var(--red);font-weight:600;margin-bottom:8px">❌ 过去：厂商 × 平台合作</p>
+        <p style="font-size:14px">厂商提供素材 → 创作者剪辑视频 → 发布到平台 → 用户<strong>看</strong></p>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px">本质：游戏的"广告"，而不是游戏本身</p>
+      </div>
+      <div class="card accent">
+        <p style="color:var(--green);font-weight:600;margin-bottom:8px">✅ 新路径：Playable 协同</p>
+        <p style="font-size:14px">厂商开放 WebGL 接口 + 素材管线 → 创作者基于管线用 AI 定制可玩体验 → 发布到 Feed → 用户<strong>玩</strong></p>
+        <p style="font-size:13px;color:var(--text);margin-top:8px">本质：游戏的"可玩片段"，用户直接体验核心乐趣</p>
+      </div>
+    </div>
+    <div>
+      <h3>《燕云十六声》案例推演</h3>
+      <div class="card">
+        <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-weight:600;color:var(--text)">Step 1：厂商开放</div>
+          <p style="font-size:14px;margin-top:4px">网易开放《燕云十六声》的 WebGL 渲染管线、角色模型、场景素材包、核心战斗逻辑 SDK</p>
+        </div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-weight:600;color:var(--text)">Step 2：创作者定制</div>
+          <p style="font-size:14px;margin-top:4px">创作者用 AI + 官方素材包，定制一段 60 秒的互动体验：<br>"在雪山上用轻功飞檐走壁，最后对战一个 Boss"</p>
+        </div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-weight:600;color:var(--text)">Step 3：Feed 分发</div>
+          <p style="font-size:14px;margin-top:4px">用户在 Feed 流中刷到 → 即点即玩 → 体验核心玩法 → "想要完整版" → 下载转化</p>
+        </div>
+        <div style="padding:12px 0">
+          <div style="font-weight:600;color:var(--text)">Step 4：数据闭环</div>
+          <p style="font-size:14px;margin-top:4px">哪些体验片段转化率最高？反哺厂商优化游戏内容和营销策略</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 8: PUBLISHER COLLAB DETAIL ==================== -->
+<div class="slide" id="s8">
+  <span class="slide-num">08 / 15</span>
+  <h2><span class="num">07</span> 厂商协同：技术架构</h2>
+  
+  <div class="card" style="font-family:monospace;padding:32px;background:var(--bg);border:1px solid var(--border);font-size:14px;line-height:2;overflow-x:auto;white-space:pre">
+┌─────────────────────────────────────────────────────────────────┐
+│                     Playable UGC Platform                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
+│  │ AI Creation  │    │   Preview    │    │  Feed 分发   │      │
+│  │    Engine    │───▶│   Sandbox    │───▶│   Pipeline   │      │
+│  │              │    │   (iframe)   │    │              │      │
+│  └──────┬───────┘    └──────────────┘    └──────────────┘      │
+│         │                                                       │
+│         ▼                                                       │
+│  ┌──────────────────────────────────────┐                      │
+│  │     Publisher SDK / Asset Pipeline    │                      │
+│  │                                      │                      │
+│  │  ┌──────────┐  ┌──────────┐  ┌────────────┐               │
+│  │  │ WebGL    │  │  素材包   │  │  逻辑 SDK  │               │
+│  │  │ Renderer │  │  Assets  │  │  Game Logic│               │
+│  │  └──────────┘  └──────────┘  └────────────┘               │
+│  │                                      │                      │
+│  │  厂商提供 ↑        AI 消费 ↑           │                      │
+│  └──────────────────────────────────────┘                      │
+│                                                                 │
+│  ┌──────────────────────────────────────┐                      │
+│  │           Analytics & Conversion      │                      │
+│  │  互动时长 · 完成率 · 分享率 · 下载转化  │                      │
+│  └──────────────────────────────────────┘                      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</div>
+
+  <div class="grid-3" style="margin-top:24px">
+    <div class="card">
+      <h3>对厂商的价值</h3>
+      <p style="font-size:14px;color:var(--text)">• 海量 UGC 供给推广素材<br>• 用户直接体验核心玩法<br>• 数据反馈优化内容<br>• 成本远低于传统买量</p>
+    </div>
+    <div class="card">
+      <h3>对创作者的价值</h3>
+      <p style="font-size:14px;color:var(--text)">• 高质量素材降低创作门槛<br>• IP 加持提升流量<br>• 厂商分成的新收入来源<br>• 差异化内容竞争力</p>
+    </div>
+    <div class="card">
+      <h3>对平台的价值</h3>
+      <p style="font-size:14px;color:var(--text)">• 独家内容形态建护城河<br>• 更高互动时长和留存<br>• 厂商广告预算新入口<br>• 游戏分发的增量收入</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 9: LAYER 3 — PLAYABLE ADS ==================== -->
+<div class="slide" id="s9">
+  <span class="slide-num">09 / 15</span>
+  <h2><span class="num">08</span> Layer 3：Playable 广告</h2>
+  <p class="lead">当"可玩内容"成为平台原生内容形态，广告的边界会模糊。</p>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <h3>Playable Ads 的优势（已验证）</h3>
+        <table>
+          <tr><td style="font-weight:600">效果指数</td><td>191（2025），同比 +16%</td></tr>
+          <tr><td style="font-weight:600">D7 ROAS</td><td>最高 17%（Top performers）</td></tr>
+          <tr><td style="font-weight:600">市场主导</td><td>AppLovin 占 59% 流量</td></tr>
+          <tr><td style="font-weight:600">增长率</td><td>11.58% CAGR → 2031</td></tr>
+        </table>
+      </div>
+
+      <div class="highlight" style="margin-top:16px">
+        <p style="font-size:14px"><strong>关键区别：</strong>传统 playable ads 是厂商单独制作的广告素材。我们的 playable ads 是<strong>从 UGC 内容中筛选出来的高转化体验</strong>——成本更低，供给更多，更原生。</p>
+      </div>
+    </div>
+    <div>
+      <h3>商业化路径</h3>
+      <div class="card">
+        <div style="padding:16px 0;border-bottom:1px solid var(--border)">
+          <span class="tag tag-green">Phase 1</span>
+          <div style="font-weight:600;color:var(--text);margin-top:8px">厂商合作推广费</div>
+          <p style="font-size:14px;margin-top:4px">厂商付费开放 SDK → 平台提供创作工具和分发流量 → 按 CPI/CPA 结算</p>
+        </div>
+        <div style="padding:16px 0;border-bottom:1px solid var(--border)">
+          <span class="tag tag-purple">Phase 2</span>
+          <div style="font-weight:600;color:var(--text);margin-top:8px">原生 Playable 广告位</div>
+          <p style="font-size:14px;margin-top:4px">Feed 流中插入品牌 Playable 体验（互动 H5 广告），用户玩完获得奖励</p>
+        </div>
+        <div style="padding:16px 0">
+          <span class="tag tag-orange">Phase 3</span>
+          <div style="font-weight:600;color:var(--text);margin-top:8px">创作者分成</div>
+          <p style="font-size:14px;margin-top:4px">高转化的 UGC 作品被厂商选中做推广素材 → 创作者获得广告分成</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 10: COMPETITIVE LANDSCAPE ==================== -->
+<div class="slide" id="s10">
+  <span class="slide-num">10 / 15</span>
+  <h2><span class="num">09</span> 竞品格局</h2>
+
+  <table style="background:var(--card);border-radius:16px;overflow:hidden">
+    <thead>
+      <tr style="background:var(--bg)">
+        <th>产品</th>
+        <th>定位</th>
+        <th>分发</th>
+        <th>AI 生成</th>
+        <th>厂商协同</th>
+        <th>威胁度</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:600">Loopit</td>
+        <td>Playable UGC 社区</td>
+        <td>独立 App Feed</td>
+        <td><span class="tag tag-green">✅ 核心</span></td>
+        <td><span class="tag tag-red">❌ 无</span></td>
+        <td><span class="tag tag-orange">中</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600">Bolt / Replit</td>
+        <td>通用 AI Coding</td>
+        <td>独立部署</td>
+        <td><span class="tag tag-green">✅</span></td>
+        <td><span class="tag tag-red">❌</span></td>
+        <td><span class="tag tag-cyan">低</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600">Scratch</td>
+        <td>教育编程社区</td>
+        <td>Web 社区</td>
+        <td><span class="tag tag-red">❌</span></td>
+        <td><span class="tag tag-red">❌</span></td>
+        <td><span class="tag tag-cyan">低</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600">Roblox</td>
+        <td>游戏创作平台</td>
+        <td>独立 App</td>
+        <td><span class="tag tag-orange">部分</span></td>
+        <td><span class="tag tag-orange">有限</span></td>
+        <td><span class="tag tag-orange">中</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600">CrazyGames/Poki</td>
+        <td>Web 游戏分发</td>
+        <td>Web 平台</td>
+        <td><span class="tag tag-red">❌</span></td>
+        <td><span class="tag tag-green">✅</span></td>
+        <td><span class="tag tag-cyan">低</span></td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:var(--accent)">我们</td>
+        <td style="color:var(--accent)">Playable UGC + 厂商协同</td>
+        <td style="color:var(--accent)">超级平台 Feed</td>
+        <td><span class="tag tag-green">✅</span></td>
+        <td><span class="tag tag-green">✅</span></td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight" style="margin-top:24px">
+    <p><strong>核心差异化：</strong>只有我们同时具备 <strong>① 数亿日活 Feed 流</strong> + <strong>② AI 生成能力</strong> + <strong>③ 游戏厂商关系</strong>。Loopit 缺 ①③，Bolt 缺 ①③，CrazyGames 缺 ②，Roblox 缺 ①。</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 11: VS CLOUD GAMING ==================== -->
+<div class="slide" id="s11">
+  <span class="slide-num">11 / 15</span>
+  <h2><span class="num">10</span> 对比：为什么不是云游戏？</h2>
+  <p class="lead">Playable UGC ≠ 云游戏。两者看似相似，实则完全不同的赛道。</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color:var(--red)">云游戏的困境</h3>
+      <table>
+        <tr><td style="font-weight:600">技术成本</td><td>GPU 服务器 + 低延迟网络，每用户成本极高</td></tr>
+        <tr><td style="font-weight:600">延迟问题</td><td>50-100ms 延迟对游戏体验致命</td></tr>
+        <tr><td style="font-weight:600">商业模式</td><td>订阅制，用户付费意愿弱</td></tr>
+        <tr><td style="font-weight:600">内容</td><td>依赖存量游戏授权，供给受限</td></tr>
+        <tr><td style="font-weight:600">代表</td><td>Google Stadia（已关停）、Xbox Cloud</td></tr>
+      </table>
+    </div>
+    <div class="card accent">
+      <h3 style="color:var(--green)">Playable UGC 的优势</h3>
+      <table>
+        <tr><td style="font-weight:600">技术成本</td><td>客户端渲染，零边际成本</td></tr>
+        <tr><td style="font-weight:600">延迟</td><td>本地运行，零延迟</td></tr>
+        <tr><td style="font-weight:600">商业模式</td><td>广告 + 厂商合作，用户免费</td></tr>
+        <tr><td style="font-weight:600">内容</td><td>UGC 无限供给 + 厂商素材包</td></tr>
+        <tr><td style="font-weight:600">品质天花板</td><td>受限于 WebGL，但<strong>够用</strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p><strong>关键区别：</strong>云游戏试图把<strong>完整游戏</strong>搬到云端（高成本、高延迟、低可行性）。Playable UGC 只做<strong>60 秒可玩片段</strong>（低成本、零延迟、高可行性）。前者是替代，后者是增量。</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 12: BUSINESS MODEL ==================== -->
+<div class="slide" id="s12">
+  <span class="slide-num">12 / 15</span>
+  <h2><span class="num">11</span> 商业模式</h2>
+
+  <div class="grid-3">
+    <div class="card">
+      <span class="icon">🏭</span>
+      <h3>厂商侧</h3>
+      <div style="margin-top:12px">
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>SDK 接入费</strong><br>厂商付费开放素材包和逻辑 SDK</p>
+        </div>
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>推广费（CPI/CPA）</strong><br>按实际下载/转化计费</p>
+        </div>
+        <div style="padding:10px 0">
+          <p style="font-size:14px;color:var(--text)"><strong>数据服务</strong><br>玩法偏好分析、A/B 测试</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="icon">👤</span>
+      <h3>创作者侧</h3>
+      <div style="margin-top:12px">
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>流量分成</strong><br>按互动量/播放量分成</p>
+        </div>
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>广告分成</strong><br>作品被用作推广素材的收益</p>
+        </div>
+        <div style="padding:10px 0">
+          <p style="font-size:14px;color:var(--text)"><strong>打赏/付费</strong><br>优质体验的虚拟礼物</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="icon">📢</span>
+      <h3>广告侧</h3>
+      <div style="margin-top:12px">
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>品牌 Playable 广告</strong><br>品牌定制互动体验</p>
+        </div>
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <p style="font-size:14px;color:var(--text)"><strong>原生信息流广告</strong><br>与 UGC 混排的 playable 广告</p>
+        </div>
+        <div style="padding:10px 0">
+          <p style="font-size:14px;color:var(--text)"><strong>Rewarded Playable</strong><br>玩完获奖励，高完成率</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <h3>收入估算（保守 / 12 个月）</h3>
+    <table>
+      <tr><td style="font-weight:600">厂商合作</td><td>10 家头部厂商 × ¥500 万/年</td><td style="text-align:right;font-weight:600;color:var(--green)">¥5,000 万</td></tr>
+      <tr><td style="font-weight:600">Playable 广告</td><td>日活占比 5% × eCPM ¥30</td><td style="text-align:right;font-weight:600;color:var(--green)">¥2 亿+</td></tr>
+      <tr><td style="font-weight:600">创作者生态（间接）</td><td>创作者分成成本</td><td style="text-align:right;font-weight:600;color:var(--orange)">-¥8,000 万</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 13: ROADMAP ==================== -->
+<div class="slide" id="s13">
+  <span class="slide-num">13 / 15</span>
+  <h2><span class="num">12</span> Roadmap</h2>
+
+  <div class="grid-3">
+    <div class="card">
+      <span class="tag tag-green">Phase 1 · Q2 2026</span>
+      <h3 style="margin-top:12px">Playable UGC MVP</h3>
+      <p style="font-size:14px;margin-top:8px;color:var(--text)">
+        • AI 生成 H5 互动内容（小游戏、quiz、meme）<br>
+        • 创作者工具：prompt → preview → publish<br>
+        • Feed 流内嵌可玩体验<br>
+        • Remix / 二创机制<br>
+        • 内部邀请测试 1000 名创作者
+      </p>
+      <div class="divider"></div>
+      <p style="font-size:13px;color:var(--muted)"><strong>目标：</strong>验证创作者愿意生产 + 用户愿意消费</p>
+    </div>
+    <div class="card">
+      <span class="tag tag-purple">Phase 2 · Q3 2026</span>
+      <h3 style="margin-top:12px">厂商协同</h3>
+      <p style="font-size:14px;margin-top:8px;color:var(--text)">
+        • Publisher SDK v1（素材包 + WebGL 渲染）<br>
+        • 首批 3-5 家厂商接入（优先休闲品类）<br>
+        • 创作者用厂商素材创建 Playable 体验<br>
+        • 转化追踪和归因<br>
+        • 全量开放创作者入口
+      </p>
+      <div class="divider"></div>
+      <p style="font-size:13px;color:var(--muted)"><strong>目标：</strong>验证厂商协同模型的 ROI</p>
+    </div>
+    <div class="card">
+      <span class="tag tag-orange">Phase 3 · Q4 2026</span>
+      <h3 style="margin-top:12px">规模化 & 商业化</h3>
+      <p style="font-size:14px;margin-top:8px;color:var(--text)">
+        • Playable 广告产品化<br>
+        • 品牌 Playable 广告 SDK<br>
+        • 头部游戏厂商深度合作（3A 级 IP）<br>
+        • 创作者分成体系<br>
+        • 国际化扩展
+      </p>
+      <div class="divider"></div>
+      <p style="font-size:13px;color:var(--muted)"><strong>目标：</strong>月收入破亿 + 10 万活跃创作者</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 14: RISKS ==================== -->
+<div class="slide" id="s14">
+  <span class="slide-num">14 / 15</span>
+  <h2><span class="num">13</span> 风险与缓解</h2>
+
+  <table style="background:var(--card);border-radius:16px;overflow:hidden">
+    <thead>
+      <tr style="background:var(--bg)">
+        <th>风险</th>
+        <th>严重度</th>
+        <th>缓解策略</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>AI 生成质量不够</strong><br>生成的可玩体验 bug 多、不好玩</td>
+        <td><span class="tag tag-red">高</span></td>
+        <td>模板库兜底 + 自动 QA + 人工精选机制。质量不过关不上 Feed。</td>
+      </tr>
+      <tr>
+        <td><strong>厂商不愿开放素材</strong><br>IP 保护、技术改造成本</td>
+        <td><span class="tag tag-orange">中</span></td>
+        <td>先从休闲品类切入（IP 敏感度低），用 ROI 数据说服头部厂商。提供标准化 SDK 降低接入成本。</td>
+      </tr>
+      <tr>
+        <td><strong>WebGL 性能天花板</strong><br>无法呈现 3A 级画面</td>
+        <td><span class="tag tag-orange">中</span></td>
+        <td>不追求画面，追求<strong>玩法</strong>。60 秒体验不需要 3A 画面，需要核心乐趣。像素/风格化美术反而更适合。</td>
+      </tr>
+      <tr>
+        <td><strong>内容审核压力</strong><br>UGC 可能产生违规互动内容</td>
+        <td><span class="tag tag-orange">中</span></td>
+        <td>沙箱运行环境 + AI 审核 + 人工抽检。iframe 隔离确保安全性。</td>
+      </tr>
+      <tr>
+        <td><strong>竞争对手跟进</strong><br>Loopit 或其他平台抢跑</td>
+        <td><span class="tag tag-cyan">低</span></td>
+        <td>我们的壁垒是流量 + 厂商关系 + 创作者生态。独立 App 无法复制这三者。</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== SLIDE 15: CLOSING ==================== -->
+<div class="slide title-slide" id="s15">
+  <span class="slide-num">15 / 15</span>
+  <h1 style="font-size:clamp(28px,4vw,52px)">从"<span style="color:var(--muted);text-decoration:line-through">看</span>视频"<br>到"<span class="gradient">玩</span>体验"</h1>
+  <div class="divider" style="margin:24px auto"></div>
+  <p class="subtitle" style="max-width:600px">
+    短视频改变了人们消费内容的方式。<br>
+    Playable UGC 会改变人们<strong style="color:var(--text)">参与内容</strong>的方式。<br><br>
+    而厂商协同，让这件事从"有意思"变成"有钱赚"。
+  </p>
+  <div class="meta" style="margin-top:60px">Next Step: 组建跨部门 Tiger Team · 启动 Phase 1 MVP</div>
+</div>
+
+<script>
+// Nav dots
+const slides = document.querySelectorAll('.slide');
+const dotsContainer = document.getElementById('navDots');
+slides.forEach((s, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  dot.onclick = () => s.scrollIntoView({ behavior: 'smooth' });
+  dotsContainer.appendChild(dot);
+});
+
+// Update active dot on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = Array.from(slides).indexOf(e.target);
+      document.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.5 });
+slides.forEach(s => observer.observe(s));
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const dots = document.querySelectorAll('.nav-dot');
+  const active = document.querySelector('.nav-dot.active');
+  const idx = Array.from(dots).indexOf(active);
+  if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (idx < slides.length - 1) slides[idx + 1].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (idx > 0) slides[idx - 1].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+</script>
+</body>
+</html>
