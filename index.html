@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibePlay — 描述你的游戏，立刻玩到它</title>
+<meta name="description" content="用自然语言创建游戏，AI 帮你搞定代码、美术、音效。30 秒从想法到可玩。">
+<meta property="og:title" content="VibePlay — AI Vibe Gaming 平台">
+<meta property="og:description" content="描述你的游戏，立刻玩到它。用自然语言创建可玩的游戏。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230F0F14'/><text x='16' y='23' text-anchor='middle' font-size='20'>🎮</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#0F0F14',
+        'bg-card': '#1A1A24',
+        'bg-elevated': '#22222E',
+        'border-card': '#2A2A34',
+        'border-hover': '#3A3A44',
+        neon: '#39FF14',
+        'neon-dim': '#2bcc10',
+        'text-primary': '#F0EDE6',
+        'text-secondary': '#888888',
+        'text-muted': '#555555',
+      },
+      fontFamily: {
+        sans: ['Space Grotesk', '"Noto Sans SC"', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+    }
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#0F0F14;color:#F0EDE6;font-family:'Space Grotesk','Noto Sans SC',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0F0F14}
+::-webkit-scrollbar-thumb{background:#2A2A34;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#39FF14}
+
+/* === Neon Effects === */
+.neon-text{text-shadow:0 0 10px rgba(57,255,20,0.5),0 0 40px rgba(57,255,20,0.12)}
+.neon-glow{box-shadow:0 0 20px rgba(57,255,20,0.3),0 0 60px rgba(57,255,20,0.08)}
+
+/* === Grid Pattern Overlay === */
+#grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(57,255,20,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(57,255,20,0.02) 1px,transparent 1px);
+  background-size:60px 60px}
+
+/* === Particles === */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+
+/* === Pages === */
+.page{display:none;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease}
+.page.active{display:block;opacity:1;transform:translateY(0)}
+
+/* === Nav underline === */
+.nav-link{position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#39FF14;transition:width .3s ease}
+.nav-link:hover::after{width:100%}
+
+/* === Buttons === */
+.btn-primary{background:#39FF14;color:#0F0F14;font-weight:600;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease;position:relative;overflow:hidden}
+.btn-primary:hover{transform:scale(1.04);box-shadow:0 0 25px rgba(57,255,20,0.4)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{border:1px solid #2A2A34;color:#F0EDE6;transition:all .2s ease;position:relative;overflow:hidden}
+.btn-secondary:hover{border-color:#39FF14;color:#39FF14}
+.btn-ghost{color:#888;transition:color .2s ease}
+.btn-ghost:hover{color:#39FF14}
+
+/* Ripple */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:rippleAnim .5s ease-out forwards;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(2.5);opacity:0}}
+
+/* === Cards === */
+.game-card{transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;position:relative}
+.game-card::before{content:'';position:absolute;inset:-1px;border-radius:13px;background:linear-gradient(135deg,transparent,transparent);transition:background .3s ease;z-index:-1}
+.game-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.3),0 0 15px rgba(57,255,20,0.1)}
+.game-card:hover::before{background:linear-gradient(135deg,rgba(57,255,20,0.3),rgba(57,255,20,0.05))}
+
+/* === Scroll Animations === */
+.reveal{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease}
+.reveal.reveal-init{opacity:0;transform:translateY(20px)}
+.reveal.reveal-init.visible{opacity:1;transform:translateY(0)}
+
+/* === Chat === */
+.chat-user{background:#39FF14;color:#0F0F14;border-radius:16px 16px 4px 16px}
+.chat-ai{background:#1A1A24;color:#F0EDE6;border-radius:16px 16px 16px 4px;border:1px solid #2A2A34}
+
+/* === Typing Dots === */
+.typing-dot{animation:bounce 1.4s infinite ease-in-out}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+
+/* === Stepper === */
+.step-line{width:2px;background:#2A2A34;position:absolute;left:15px;top:32px;bottom:0}
+.step-line.done{background:#39FF14}
+.step-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .3s ease}
+.step-pending .step-icon{background:#1A1A24;border:2px solid #2A2A34;color:#555}
+.step-running .step-icon{background:#39FF14;border:2px solid #39FF14;color:#0F0F14;animation:pulse 1.5s infinite}
+.step-done .step-icon{background:#39FF14;border:2px solid #39FF14;color:#0F0F14}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(57,255,20,0.4)}50%{box-shadow:0 0 0 8px rgba(57,255,20,0)}}
+
+/* === Skeleton === */
+.skeleton{background:linear-gradient(90deg,#1A1A24 25%,#22222E 50%,#1A1A24 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* === Toast === */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:#1A1A24;border:1px solid #39FF14;color:#F0EDE6;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;box-shadow:0 0 20px rgba(57,255,20,0.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* === Login Modal === */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-content{transform:scale(.95) translateY(10px);transition:transform .3s ease}
+.modal-overlay.show .modal-content{transform:scale(1) translateY(0)}
+
+/* === Pricing "Popular" badge === */
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#39FF14;color:#0F0F14;font-size:12px;font-weight:700;padding:4px 16px;border-radius:20px;white-space:nowrap}
+
+/* === Input Focus Glow === */
+input:focus,textarea:focus{outline:none;border-color:#39FF14;box-shadow:0 0 0 3px rgba(57,255,20,0.1)}
+input,textarea{transition:border-color .2s ease,box-shadow .2s ease}
+
+/* === Mini Canvas Previews === */
+.mini-canvas{image-rendering:pixelated}
+
+/* === Tab active === */
+.tab-active{color:#39FF14!important;border-bottom:2px solid #39FF14}
+
+/* === Star Rating === */
+.star{color:#2A2A34;transition:color .2s}
+.star.filled{color:#FFD700}
+
+/* === Game card hover canvas animation === */
+.game-card:hover .preview-canvas{opacity:1}
+.preview-canvas{opacity:0;transition:opacity .3s ease}
+
+/* === Counter === */
+.counter{font-variant-numeric:tabular-nums}
+
+/* === Mobile menu === */
+.mobile-menu{transform:translateX(100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.mobile-menu.open{transform:translateX(0)}
+
+/* === Builder tabs === */
+.builder-tab{transition:all .2s ease;cursor:pointer}
+.builder-tab.active{color:#39FF14;border-bottom:2px solid #39FF14}
+
+/* === Code viewer === */
+.code-viewer{background:#0a0a10;color:#F0EDE6;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;tab-size:2}
+.code-kw{color:#39FF14}
+.code-str{color:#F0C674}
+.code-cm{color:#666}
+.code-fn{color:#39FF14}
+.code-num{color:#81A2BE}
+
+/* === Generation Stepper Timeline === */
+.generation-stepper{position:relative;padding-left:16px}
+.generation-stepper::before{content:'';position:absolute;left:15px;top:16px;bottom:16px;width:2px;background:#2A2A34}
+.gen-step-item{position:relative;display:flex;align-items:flex-start;gap:12px;padding:8px 0}
+.gen-step-item .step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
+.gen-step-item.done .step-dot{background:rgba(57,255,20,0.15);border:2px solid #39FF14}
+.gen-step-item.done .step-title{color:#39FF14}
+.gen-step-item.done .step-time{color:#39FF14}
+.gen-step-item.running .step-dot{background:#39FF14;border:2px solid #39FF14;animation:pulse 1.5s infinite}
+.gen-step-item.running .step-title{color:#39FF14}
+.gen-step-item.pending .step-dot{background:#1A1A24;border:2px solid #2A2A34}
+.gen-step-item.pending .step-title{color:#555}
+.gen-step-item.pending .step-desc{color:#444}
+.gen-step-item .step-title{font-size:12px;font-weight:600}
+.gen-step-item .step-desc{font-size:10px;color:#888;margin-top:1px}
+.gen-step-item .step-time{font-size:10px;font-family:'JetBrains Mono',monospace;color:#555;margin-left:auto;flex-shrink:0}
+.gen-step-connector{position:absolute;left:15px;top:0;bottom:0;width:2px}
+.gen-step-item.done+.gen-step-item .gen-step-connector,
+.gen-step-item.done .gen-step-connector{background:#39FF14}
+
+/* === DNA pills === */
+.dna-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)}
+
+/* === Screen shake === */
+@keyframes screenShake{0%,100%{transform:translate(0)}10%{transform:translate(-3px,2px)}20%{transform:translate(3px,-2px)}30%{transform:translate(-2px,3px)}40%{transform:translate(2px,-1px)}50%{transform:translate(-1px,2px)}}
+.screen-shake{animation:screenShake .3s ease}
+
+/* === Power-up flash === */
+@keyframes powerFlash{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.power-flash{position:absolute;inset:0;pointer-events:none;animation:powerFlash .3s ease-out forwards}
+
+/* === Custom Select === */
+.custom-select .cs-dropdown{max-height:0;overflow:hidden;opacity:0;transition:max-height .2s ease,opacity .2s ease}
+.custom-select.open .cs-dropdown{max-height:320px;opacity:1;display:block!important}
+.custom-select.open .cs-arrow{transform:rotate(180deg)}
+.custom-select .cs-trigger:focus{border-color:#39FF14;box-shadow:0 0 0 3px rgba(57,255,20,0.1)}
+.cs-opt.selected{color:#39FF14;background:rgba(57,255,20,0.05)}
+
+/* === How It Works connector === */
+@media(min-width:640px){
+  .steps-grid{position:relative}
+  .steps-grid::before{content:'';position:absolute;top:32px;left:calc(16.67% + 32px);right:calc(16.67% + 32px);height:1px;background:linear-gradient(90deg,#2A2A34,#39FF14 50%,#2A2A34);opacity:0.3}
+}
+
+/* === Generation mockup animation === */
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor-blink::after{content:'▊';animation:blink 1s infinite;color:#39FF14;margin-left:2px}
+</style>
+</head>
+<body>
+
+<!-- Grid background -->
+<div id="grid-bg"></div>
+<!-- Particles -->
+<canvas id="particles"></canvas>
+
+<!-- ===== NAV ===== -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border-card">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <a onclick="navigateTo('')" class="text-xl font-bold text-neon neon-text font-mono tracking-tight cursor-pointer select-none flex items-center gap-2">
+      <span class="text-2xl">🎮</span> VibePlay
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a onclick="navigateTo('community')" class="nav-link text-text-secondary hover:text-neon transition-colors text-sm cursor-pointer">社区</a>
+      <a onclick="navigateTo('pricing')" class="nav-link text-text-secondary hover:text-neon transition-colors text-sm cursor-pointer">定价</a>
+      <a onclick="promptApiKey()" class="text-text-secondary hover:text-neon transition-colors text-sm cursor-pointer" title="设置 API Key">⚙️</a>
+      <a onclick="showLogin()" class="btn-secondary text-sm px-5 py-2 rounded-lg cursor-pointer">登录</a>
+      <a onclick="navigateTo('builder')" class="btn-primary text-sm px-5 py-2 rounded-lg cursor-pointer">开始构建</a>
+    </div>
+    <button class="md:hidden text-text-primary p-2" onclick="toggleMobile()">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 bg-bg-card border-l border-border-card z-[60] pt-20 px-6">
+  <button class="absolute top-5 right-5 text-text-secondary" onclick="toggleMobile()">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M6 18L18 6"/></svg>
+  </button>
+  <div class="flex flex-col gap-6">
+    <a onclick="navigateTo('');toggleMobile()" class="text-text-primary text-lg cursor-pointer">首页</a>
+    <a onclick="navigateTo('community');toggleMobile()" class="text-text-primary text-lg cursor-pointer">社区</a>
+    <a onclick="navigateTo('pricing');toggleMobile()" class="text-text-primary text-lg cursor-pointer">定价</a>
+    <a onclick="navigateTo('builder');toggleMobile()" class="text-neon text-lg font-semibold cursor-pointer">开始构建 →</a>
+  </div>
+</div>
+
+<!-- ===== LOGIN MODAL ===== -->
+<div id="loginModal" class="modal-overlay" onclick="if(event.target===this)hideLogin()">
+  <div class="modal-content w-full max-w-md mx-auto mt-[20vh] bg-bg-card border border-border-card rounded-xl p-8">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-xl font-bold">登录 VibePlay</h2>
+      <button onclick="hideLogin()" class="text-text-secondary hover:text-text-primary transition-colors">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l8 8M6 14L14 6"/></svg>
+      </button>
+    </div>
+    <div class="space-y-4 mb-6">
+      <div>
+        <label class="block text-sm text-text-secondary mb-1.5">邮箱</label>
+        <input type="email" placeholder="you@example.com" class="w-full bg-bg border border-border-card rounded-lg px-4 py-3 text-sm text-text-primary placeholder-text-muted">
+      </div>
+      <div>
+        <label class="block text-sm text-text-secondary mb-1.5">密码</label>
+        <input type="password" placeholder="••••••••" class="w-full bg-bg border border-border-card rounded-lg px-4 py-3 text-sm text-text-primary placeholder-text-muted">
+      </div>
+    </div>
+    <button class="btn-primary w-full py-3 rounded-lg text-sm mb-4" onclick="hideLogin();showToast('欢迎回来! 🎮')">登录</button>
+    <div class="relative my-6">
+      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-border-card"></div></div>
+      <div class="relative flex justify-center"><span class="bg-bg-card px-3 text-xs text-text-muted">或</span></div>
+    </div>
+    <div class="space-y-3">
+      <button class="btn-secondary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" onclick="hideLogin();showToast('欢迎回来! 🎮')">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google 登录
+      </button>
+      <button class="btn-secondary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2" onclick="hideLogin();showToast('欢迎回来! 🎮')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub 登录
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="toast"></div>
+
+<!-- ======================== LANDING PAGE ======================== -->
+<div id="page-landing" class="page active">
+  <div class="relative z-10 pt-16">
+
+    <!-- Hero -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-20">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <!-- Left: Copy -->
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-card border border-border-card rounded-full text-xs text-text-secondary mb-6">
+            <span class="w-2 h-2 rounded-full bg-neon animate-pulse"></span>
+            Vibe Coding 的游戏垂类
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6">
+            描述你的游戏，<br><span class="text-neon neon-text">立刻玩到它。</span>
+          </h1>
+          <p class="text-text-secondary text-lg leading-relaxed mb-10 max-w-lg">
+            用自然语言创建游戏，AI 帮你搞定代码、美术、音效。<br>30 秒从想法到可玩。
+          </p>
+
+          <!-- Prompt Builder -->
+          <div class="bg-bg-card border border-border-card rounded-xl p-5 mb-4">
+            <textarea id="heroTextarea" rows="3" class="w-full bg-transparent text-text-primary placeholder-text-muted resize-none text-sm leading-relaxed border-none p-0 mb-4 focus:ring-0" style="box-shadow:none" placeholder="描述你想要的游戏...&#10;&#10;例如：一个像素风格的太空射击游戏，有三种武器升级和 Boss 战。"></textarea>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <div class="custom-select relative" data-id="selType">
+                <button type="button" class="cs-trigger bg-bg border border-border-card rounded-lg px-3 py-1.5 text-xs text-text-secondary cursor-pointer hover:border-neon transition-colors flex items-center gap-1.5 min-w-[100px]" onclick="toggleCS(this)">
+                  <span class="cs-label">游戏类型</span>
+                  <svg class="cs-arrow w-3 h-3 ml-auto opacity-50 transition-transform" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5l3 3 3-3"/></svg>
+                </button>
+                <div class="cs-dropdown absolute top-full left-0 mt-1 bg-bg-card border border-border-card rounded-lg py-1 min-w-[140px] z-50 shadow-xl hidden">
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'游戏类型')">游戏类型</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'平台跳跃')">平台跳跃</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'太空射击')">太空射击</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'卡牌对战')">卡牌对战</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'互动小说')">互动小说</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'益智解谜')">益智解谜</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'塔防')">塔防</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'2D RPG')">2D RPG</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'跑酷')">跑酷</div>
+                </div>
+              </div>
+              <div class="custom-select relative" data-id="selStyle">
+                <button type="button" class="cs-trigger bg-bg border border-border-card rounded-lg px-3 py-1.5 text-xs text-text-secondary cursor-pointer hover:border-neon transition-colors flex items-center gap-1.5 min-w-[100px]" onclick="toggleCS(this)">
+                  <span class="cs-label">视觉风格</span>
+                  <svg class="cs-arrow w-3 h-3 ml-auto opacity-50 transition-transform" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5l3 3 3-3"/></svg>
+                </button>
+                <div class="cs-dropdown absolute top-full left-0 mt-1 bg-bg-card border border-border-card rounded-lg py-1 min-w-[140px] z-50 shadow-xl hidden">
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'视觉风格')">视觉风格</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'像素风')">像素风</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'赛博朋克')">赛博朋克</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'手绘水彩')">手绘水彩</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'低多边形')">低多边形</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'日系动画')">日系动画</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'暗黑哥特')">暗黑哥特</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'极简')">极简</div>
+                </div>
+              </div>
+              <div class="custom-select relative" data-id="selDiff">
+                <button type="button" class="cs-trigger bg-bg border border-border-card rounded-lg px-3 py-1.5 text-xs text-text-secondary cursor-pointer hover:border-neon transition-colors flex items-center gap-1.5 min-w-[80px]" onclick="toggleCS(this)">
+                  <span class="cs-label">难度</span>
+                  <svg class="cs-arrow w-3 h-3 ml-auto opacity-50 transition-transform" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5l3 3 3-3"/></svg>
+                </button>
+                <div class="cs-dropdown absolute top-full left-0 mt-1 bg-bg-card border border-border-card rounded-lg py-1 min-w-[110px] z-50 shadow-xl hidden">
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'难度')">难度</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'休闲')">休闲</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'中等')">中等</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'硬核')">硬核</div>
+                  <div class="cs-opt px-3 py-1.5 text-xs text-text-secondary hover:text-neon hover:bg-neon/5 cursor-pointer transition-colors" onclick="pickCS(this,'渐进式')">渐进式</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary w-full py-3.5 rounded-lg text-base flex items-center justify-center gap-2" onclick="startBuildFromLanding()">
+              开始构建 <span class="text-lg">→</span>
+            </button>
+          </div>
+          <p class="text-text-muted text-xs text-center">免费开始 · 无需信用卡 · 30 秒出结果</p>
+        </div>
+
+        <!-- Right: Animated Generation Mockup -->
+        <div class="hidden lg:block">
+          <div class="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-2xl">
+            <!-- Mock title bar -->
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-border-card">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+                <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+              </div>
+              <span class="text-xs text-text-muted font-mono ml-2">VibePlay Builder</span>
+            </div>
+            <div class="grid grid-cols-2">
+              <!-- Chat side -->
+              <div class="border-r border-border-card p-4 space-y-3" style="min-height:340px">
+                <div class="flex justify-end">
+                  <div class="chat-user px-3 py-2 text-xs max-w-[90%]">做一个太空射击游戏，像素风</div>
+                </div>
+                <div class="flex gap-2 items-start">
+                  <div class="w-6 h-6 rounded-full bg-neon/20 flex items-center justify-center text-[10px] flex-shrink-0">⚛️</div>
+                  <div class="chat-ai px-3 py-2 text-xs max-w-[90%]">
+                    <div id="mockTyping" class="font-mono text-[11px] leading-relaxed">
+                      <span class="text-text-muted">正在生成...</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Progress steps -->
+                <div id="mockSteps" class="space-y-2 pt-2"></div>
+              </div>
+              <!-- Preview side -->
+              <div class="p-4 flex flex-col">
+                <div class="text-[10px] text-text-muted font-mono mb-2">游戏预览</div>
+                <canvas id="mockGameCanvas" class="w-full flex-1 rounded-lg bg-[#0a0a10] mini-canvas" style="min-height:260px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game Type Cards -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+      <div class="text-center mb-10 reveal">
+        <p class="text-text-secondary text-sm mb-2">或者从灵感开始</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 reveal">
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('平台跳跃','一个像素风平台跳跃游戏，主角是一只橘猫，需要跳过浮动平台收集鱼干，有双段跳和冲刺能力。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🏃</div>
+          <h3 class="text-sm font-semibold mb-1">平台跳跃</h3>
+          <p class="text-[10px] text-text-muted leading-tight">跑跳收集，经典玩法</p>
+        </div>
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('太空射击','一个竖版太空射击游戏，玩家驾驶战机对抗外星虫群。弹幕风格，霓虹配色，有 Boss 战和武器升级。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🔫</div>
+          <h3 class="text-sm font-semibold mb-1">太空射击</h3>
+          <p class="text-[10px] text-text-muted leading-tight">弹幕飞行，激烈对抗</p>
+        </div>
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('卡牌对战','一个 Roguelike 卡牌游戏，每回合从三张卡牌中选一张出。有攻击、防御、治疗三种类型。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🃏</div>
+          <h3 class="text-sm font-semibold mb-1">卡牌对战</h3>
+          <p class="text-[10px] text-text-muted leading-tight">策略构筑，随机挑战</p>
+        </div>
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('互动小说','一个赛博朋克风格的互动小说，玩家扮演黑客潜入巨型企业。每个决策影响剧情走向，有三个结局。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">📖</div>
+          <h3 class="text-sm font-semibold mb-1">互动小说</h3>
+          <p class="text-[10px] text-text-muted leading-tight">分支叙事，沉浸故事</p>
+        </div>
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('益智解谜','一个推箱子变体解谜游戏，把不同颜色的光球推到对应接收器上。有传送门和镜面反射机制。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🧩</div>
+          <h3 class="text-sm font-semibold mb-1">益智解谜</h3>
+          <p class="text-[10px] text-text-muted leading-tight">烧脑关卡，逻辑快感</p>
+        </div>
+        <div class="game-type-card bg-bg-card border border-border-card rounded-xl p-4 cursor-pointer text-center hover:border-neon transition-all group" onclick="pickType('塔防','一个中世纪塔防游戏，建造弓箭塔、魔法塔和投石机抵御兽人进攻。有升级系统。')">
+          <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🏰</div>
+          <h3 class="text-sm font-semibold mb-1">塔防</h3>
+          <p class="text-[10px] text-text-muted leading-tight">战略布局，层层抵御</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+      <div class="grid grid-cols-3 gap-4 sm:gap-8">
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-bold text-neon neon-text font-mono counter"><span class="count-up" data-target="12847">0</span>+</p>
+          <p class="text-text-secondary text-xs sm:text-sm mt-2">游戏被创建</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-bold text-text-primary font-mono counter"><span class="count-up" data-target="1200">0</span>+</p>
+          <p class="text-text-secondary text-xs sm:text-sm mt-2">活跃创作者</p>
+        </div>
+        <div class="text-center">
+          <p class="text-3xl sm:text-4xl font-bold text-text-primary font-mono counter"><span class="count-up" data-target="98">0</span>%</p>
+          <p class="text-text-secondary text-xs sm:text-sm mt-2">用户满意度</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-4 reveal">三步，从想法到游戏</h2>
+      <p class="text-text-secondary text-center mb-16 reveal">不需要学引擎，不需要写代码，不需要找美术</p>
+      <div class="grid sm:grid-cols-3 gap-8 sm:gap-12 steps-grid">
+        <div class="text-center reveal">
+          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-bg-card border border-border-card flex items-center justify-center text-3xl">💡</div>
+          <div class="text-xs font-mono text-neon mb-2">STEP 01</div>
+          <h3 class="text-lg font-semibold mb-2">描述你的想法</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">用自然语言描述你心中的游戏，类型、风格、机制，想到什么写什么。</p>
+        </div>
+        <div class="text-center reveal">
+          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-bg-card border border-border-card flex items-center justify-center text-3xl">⚡</div>
+          <div class="text-xs font-mono text-neon mb-2">STEP 02</div>
+          <h3 class="text-lg font-semibold mb-2">AI 生成游戏</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">AI 解析你的想法，自动生成代码、美术素材和音效。实时预览，边生成边调整。</p>
+        </div>
+        <div class="text-center reveal">
+          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-bg-card border border-border-card flex items-center justify-center text-3xl">🌍</div>
+          <div class="text-xs font-mono text-neon mb-2">STEP 03</div>
+          <h3 class="text-lg font-semibold mb-2">分享给世界</h3>
+          <p class="text-text-secondary text-sm leading-relaxed">一键发布到社区，获取分享链接。让全世界玩到你的创意。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Games -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+      <div class="flex items-center justify-between mb-10 reveal">
+        <h2 class="text-2xl sm:text-3xl font-bold">🔥 社区热门</h2>
+        <a onclick="navigateTo('community')" class="btn-ghost text-sm cursor-pointer flex items-center gap-1">查看全部 →</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" id="hotGames"></div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricingSection" class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-4 reveal">选择你的方案</h2>
+      <p class="text-text-secondary text-center mb-12 reveal">从免费开始，随时升级</p>
+      <div class="grid sm:grid-cols-3 gap-5 reveal">
+        <!-- Free -->
+        <div class="bg-bg-card border border-border-card rounded-xl p-6 flex flex-col">
+          <h3 class="text-lg font-semibold mb-1">Free</h3>
+          <p class="text-text-secondary text-sm mb-4">适合尝鲜和学习</p>
+          <p class="text-3xl font-bold mb-6">¥0 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 3 个项目/月</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 社区发布</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 基础 AI 生成</li>
+            <li class="flex items-start gap-2"><span class="text-text-muted mt-0.5">—</span> <span class="text-text-muted">VibePlay 水印</span></li>
+          </ul>
+          <button class="btn-secondary w-full py-3 rounded-lg text-sm" onclick="navigateTo('builder')">免费开始</button>
+        </div>
+        <!-- Pro -->
+        <div class="bg-bg-card border-2 border-neon rounded-xl p-6 flex flex-col relative neon-glow">
+          <div class="popular-badge">最受欢迎</div>
+          <h3 class="text-lg font-semibold mb-1">Pro</h3>
+          <p class="text-text-secondary text-sm mb-4">适合独立创作者</p>
+          <p class="text-3xl font-bold mb-6">¥49 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 无限项目</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 去水印</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 自定义域名</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 优先 AI 生成</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 高级素材生成</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 数据分析</li>
+          </ul>
+          <button class="btn-primary w-full py-3 rounded-lg text-sm" onclick="showToast('即将开放! 加入候补名单 📋')">升级 Pro</button>
+        </div>
+        <!-- Team -->
+        <div class="bg-bg-card border border-border-card rounded-xl p-6 flex flex-col">
+          <h3 class="text-lg font-semibold mb-1">Team</h3>
+          <p class="text-text-secondary text-sm mb-4">适合团队协作</p>
+          <p class="text-3xl font-bold mb-6">¥149 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 一切 Pro 功能</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 协作编辑</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 私有项目</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> API 访问</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 专属客服</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 团队管理</li>
+          </ul>
+          <button class="btn-secondary w-full py-3 rounded-lg text-sm" onclick="showToast('联系我们获取 Team 方案 💬')">联系我们</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12 reveal">创作者们怎么说</h2>
+      <div class="grid sm:grid-cols-3 gap-5 reveal">
+        <div class="bg-bg-card border border-border-card rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-[#FF6B6B] flex items-center justify-center text-sm font-bold text-white">张</div>
+            <div>
+              <p class="text-sm font-semibold">张明</p>
+              <p class="text-xs text-text-muted">产品经理</p>
+            </div>
+          </div>
+          <p class="text-sm text-text-secondary leading-relaxed italic">"用 VibePlay 做了一个塔防游戏给我女儿，她玩了一整个下午。从想法到成品只用了 5 分钟。"</p>
+          <div class="flex gap-0.5 mt-4">
+            <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+          </div>
+        </div>
+        <div class="bg-bg-card border border-border-card rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-[#4ECDC4] flex items-center justify-center text-sm font-bold text-white">李</div>
+            <div>
+              <p class="text-sm font-semibold">李雪</p>
+              <p class="text-xs text-text-muted">独立游戏开发者</p>
+            </div>
+          </div>
+          <p class="text-sm text-text-secondary leading-relaxed italic">"作为独立游戏开发者，我用 VibePlay 快速验证游戏创意。省了至少两周原型时间。"</p>
+          <div class="flex gap-0.5 mt-4">
+            <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+          </div>
+        </div>
+        <div class="bg-bg-card border border-border-card rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-[#A78BFA] flex items-center justify-center text-sm font-bold text-white">王</div>
+            <div>
+              <p class="text-sm font-semibold">王浩</p>
+              <p class="text-xs text-text-muted">高中信息技术教师</p>
+            </div>
+          </div>
+          <p class="text-sm text-text-secondary leading-relaxed italic">"学生们爱死了！课上用 VibePlay 教游戏设计，每个人都能做出自己的作品。"</p>
+          <div class="flex gap-0.5 mt-4">
+            <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-24 reveal">
+      <div class="rounded-2xl p-10 sm:p-16 text-center relative overflow-hidden" style="background:linear-gradient(135deg, rgba(57,255,20,0.12) 0%, rgba(57,255,20,0.06) 50%, rgba(57,255,20,0.02) 100%);border:1px solid rgba(57,255,20,0.2)">
+        <div class="absolute inset-0 bg-gradient-to-r from-neon/5 via-transparent to-neon/3"></div>
+        <div class="relative">
+          <h2 class="text-2xl sm:text-4xl font-bold mb-4">准备好创造你的第一个游戏了吗？</h2>
+          <p class="text-text-secondary mb-8">加入 1,200+ 创作者，用 AI 将你的游戏创意变成现实。</p>
+          <button class="px-10 py-4 rounded-lg text-lg font-semibold transition-all hover:scale-105" style="background:#0F0F14;color:#39FF14;border:2px solid #39FF14" onclick="navigateTo('builder');playMelody('start')">
+            免费开始构建 →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 py-8 border-t border-border-card">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-text-muted text-xs font-mono">
+        <span>© 2026 VibePlay. AI 驱动的游戏创作平台。</span>
+        <div class="flex gap-6">
+          <a href="#" class="hover:text-neon transition-colors">关于</a>
+          <a href="#" class="hover:text-neon transition-colors">文档</a>
+          <a href="#" class="hover:text-neon transition-colors">GitHub</a>
+          <a href="#" class="hover:text-neon transition-colors">Discord</a>
+          <a href="#" class="hover:text-neon transition-colors">隐私</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+
+<!-- ======================== BUILDER PAGE ======================== -->
+<div id="page-builder" class="page">
+  <div class="relative z-10 pt-16 h-screen flex flex-col">
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+      <!-- Left: Chat + Controls -->
+      <div class="w-full lg:w-[42%] flex flex-col border-r border-border-card bg-bg h-[50vh] lg:h-auto">
+        <!-- Header -->
+        <div class="px-4 py-3 border-b border-border-card flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-neon animate-pulse"></div>
+            <span class="text-sm font-mono text-text-secondary">VibePlay AI</span>
+          </div>
+          <button class="text-xs text-text-muted hover:text-neon transition-colors" onclick="toggleStepper()">生成进度 ▾</button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-4"></div>
+
+        <!-- Generation Progress Stepper -->
+        <div id="genStepper" class="border-t border-border-card bg-bg-card/50 overflow-hidden transition-all duration-300" style="display:none">
+          <div class="px-4 py-3">
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-xs font-mono text-text-muted">生成进度</div>
+              <button class="text-[10px] text-text-muted hover:text-neon transition-colors" onclick="toggleStepper()">收起 ▴</button>
+            </div>
+            <div style="position:relative;padding-left:0">
+              <div class="gen-step-item done" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div style="width:2px;background:#39FF14;position:absolute;left:15px;top:32px;bottom:-6px"></div>
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(57,255,20,0.15);border:2px solid #39FF14;position:relative;z-index:1">🧠</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#39FF14">意图解析</div>
+                  <div style="font-size:10px;color:#888;margin-top:1px">理解游戏类型和核心机制</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#39FF14;flex-shrink:0">0.8s</div>
+              </div>
+              <div class="gen-step-item done" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div style="width:2px;background:#39FF14;position:absolute;left:15px;top:32px;bottom:-6px"></div>
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(57,255,20,0.15);border:2px solid #39FF14;position:relative;z-index:1">🎯</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#39FF14">游戏设计</div>
+                  <div style="font-size:10px;color:#888;margin-top:1px">设计关卡、平衡性和游戏循环</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#39FF14;flex-shrink:0">1.2s</div>
+              </div>
+              <div class="gen-step-item done" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div style="width:2px;background:#39FF14;position:absolute;left:15px;top:32px;bottom:-6px"></div>
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(57,255,20,0.15);border:2px solid #39FF14;position:relative;z-index:1">💻</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#39FF14">代码生成</div>
+                  <div style="font-size:10px;color:#888;margin-top:1px">生成 Canvas 游戏代码</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#39FF14;flex-shrink:0">2.1s</div>
+              </div>
+              <div class="gen-step-item done" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div style="width:2px;background:#39FF14;position:absolute;left:15px;top:32px;bottom:-6px"></div>
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(57,255,20,0.15);border:2px solid #39FF14;position:relative;z-index:1">🎨</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#39FF14">素材创建</div>
+                  <div style="font-size:10px;color:#888;margin-top:1px">AI 生成角色、场景、UI 素材</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#39FF14;flex-shrink:0">3.4s</div>
+              </div>
+              <div class="gen-step-item running" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div style="width:2px;background:#2A2A34;position:absolute;left:15px;top:32px;bottom:-6px"></div>
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:#39FF14;border:2px solid #39FF14;position:relative;z-index:1;animation:pulse 1.5s infinite">🔊</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#39FF14">音效设计</div>
+                  <div style="font-size:10px;color:#888;margin-top:1px">创建背景音乐和音效</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#39FF14;flex-shrink:0">...</div>
+              </div>
+              <div class="gen-step-item pending" style="display:flex;align-items:flex-start;gap:12px;padding:6px 0;position:relative">
+                <div class="step-dot" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:#1A1A24;border:2px solid #2A2A34;position:relative;z-index:1">✅</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:600;color:#555">QA 测试</div>
+                  <div style="font-size:10px;color:#444;margin-top:1px">自动测试可玩性和性能</div>
+                </div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#555;flex-shrink:0">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game DNA pills -->
+        <div id="gameDNA" class="px-4 py-2.5 border-t border-border-card bg-bg-card/30 overflow-x-auto" style="display:none">
+          <div class="flex gap-2 whitespace-nowrap pb-1" style="scrollbar-width:none">
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">类型:太空射击</span>
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">风格:像素</span>
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">难度:中等</span>
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">引擎:Canvas2D</span>
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">视角:俯视</span>
+            <span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">操控:键盘+触屏</span>
+          </div>
+        </div>
+
+        <!-- Sample Prompts -->
+        <div id="samplePrompts" class="flex gap-2 flex-wrap px-4 py-2 border-t border-[#2A2A34]">
+          <button class="text-xs px-3 py-1 rounded-full border border-[#2A2A34] text-[#888] hover:border-[#39FF14] hover:text-[#39FF14] transition-colors" onclick="quickPrompt('做一个贪吃蛇游戏，霓虹风格')">🐍 贪吃蛇</button>
+          <button class="text-xs px-3 py-1 rounded-full border border-[#2A2A34] text-[#888] hover:border-[#39FF14] hover:text-[#39FF14] transition-colors" onclick="quickPrompt('做一个打砖块游戏，有道具掉落')">🧱 打砖块</button>
+          <button class="text-xs px-3 py-1 rounded-full border border-[#2A2A34] text-[#888] hover:border-[#39FF14] hover:text-[#39FF14] transition-colors" onclick="quickPrompt('做一个太空射击游戏，有Boss战')">🚀 太空射击</button>
+          <button class="text-xs px-3 py-1 rounded-full border border-[#2A2A34] text-[#888] hover:border-[#39FF14] hover:text-[#39FF14] transition-colors" onclick="quickPrompt('做一个记忆翻牌游戏，动物主题')">🃏 记忆翻牌</button>
+        </div>
+        <!-- Input -->
+        <div class="px-4 py-3 border-t border-border-card">
+          <div class="flex gap-2">
+            <input id="chatInput" type="text" class="flex-1 bg-bg-card border border-border-card rounded-lg px-4 py-2.5 text-sm text-text-primary placeholder-text-muted" placeholder="描述你想要的游戏，或修改当前游戏..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="btn-primary px-4 py-2.5 rounded-lg text-sm" onclick="sendChat()">发送</button>
+          </div>
+          <p id="chatHint" class="text-[10px] text-text-muted text-center mt-1.5">💡 试试输入：做一个贪吃蛇游戏</p>
+        </div>
+      </div>
+
+      <!-- Right: Preview -->
+      <div class="w-full lg:w-[58%] flex flex-col bg-bg h-[50vh] lg:h-auto">
+        <!-- Controls bar -->
+        <div class="px-4 py-2 border-b border-border-card flex items-center justify-between">
+          <div class="flex gap-2">
+            <button class="px-3 py-1.5 bg-bg-card border border-border-card rounded-lg text-xs text-text-secondary hover:border-neon transition-colors" onclick="toggleGame(true)">▶ 播放</button>
+            <button class="px-3 py-1.5 bg-bg-card border border-border-card rounded-lg text-xs text-text-secondary hover:border-neon transition-colors" onclick="toggleGame(false)">⏸ 暂停</button>
+            <button class="px-3 py-1.5 bg-bg-card border border-border-card rounded-lg text-xs text-text-secondary hover:border-neon transition-colors" onclick="resetGame()">↻ 重新生成</button>
+          </div>
+        </div>
+        <!-- Tab Bar -->
+        <div class="px-4 py-0 border-b border-border-card flex items-center">
+          <div class="flex">
+            <button class="builder-tab active px-4 py-3 text-sm" onclick="switchBuilderTab(this,'preview')">预览</button>
+            <button class="builder-tab px-4 py-3 text-sm text-text-secondary" onclick="switchBuilderTab(this,'code')">代码</button>
+            <button class="builder-tab px-4 py-3 text-sm text-text-secondary" onclick="switchBuilderTab(this,'assets')">资源</button>
+          </div>
+        </div>
+
+        <!-- Preview Tab -->
+        <div id="tab-preview" class="flex-1 flex items-center justify-center p-4 relative">
+          <div id="gameContainer" class="w-full h-full bg-[#0a0a10] rounded-xl border border-border-card overflow-hidden relative">
+            <canvas id="gameCanvas" class="w-full h-full" style="image-rendering:pixelated"></canvas>
+            <iframe id="gameFrame" sandbox="allow-scripts allow-same-origin" class="w-full h-full border-0 rounded-xl bg-black absolute inset-0" style="display:none"></iframe>
+            <div id="powerFlashOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;border-radius:12px"></div>
+            <div id="gameOverlay" class="absolute inset-0 flex items-center justify-center bg-bg/70 backdrop-blur-sm" style="display:none">
+              <div class="text-center">
+                <p class="text-neon font-mono text-lg mb-2">⏸ 已暂停</p>
+                <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="toggleGame(true)">继续</button>
+              </div>
+            </div>
+            <div id="gameOverScreen" class="absolute inset-0 flex items-center justify-center bg-bg/80 backdrop-blur-sm" style="display:none">
+              <div class="text-center">
+                <p class="text-4xl font-bold neon-text mb-3 font-mono" style="color:#39FF14;text-shadow:0 0 20px rgba(57,255,20,0.6),0 0 60px rgba(57,255,20,0.2)">GAME OVER</p>
+                <p class="font-mono text-5xl mb-1" style="color:#39FF14" id="finalScore">0</p>
+                <p class="text-text-muted text-sm mb-1">最终得分</p>
+                <p class="text-text-secondary text-xs mb-5" id="highScoreDisplay"></p>
+                <button class="btn-primary px-8 py-3 rounded-lg text-sm" onclick="resetGame()">再来一局 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Tab -->
+        <div id="tab-code" class="flex-1 overflow-auto p-4" style="display:none">
+          <div class="code-viewer rounded-xl border border-border-card p-4 overflow-auto h-full whitespace-pre"><span class="code-cm">// VibePlay Auto-Generated Game</span>
+<span class="code-cm">// Type: Space Shooter | Engine: Canvas2D</span>
+
+<span class="code-kw">class</span> SpaceShooter {
+  <span class="code-kw">constructor</span>(canvas) {
+    <span class="code-kw">this</span>.canvas = canvas;
+    <span class="code-kw">this</span>.ctx = canvas.getContext(<span class="code-str">'2d'</span>);
+    <span class="code-kw">this</span>.ship = { x: <span class="code-num">400</span>, y: <span class="code-num">500</span>, width: <span class="code-num">30</span>, height: <span class="code-num">20</span> };
+    <span class="code-kw">this</span>.bullets = [];
+    <span class="code-kw">this</span>.asteroids = [];
+    <span class="code-kw">this</span>.score = <span class="code-num">0</span>;
+    <span class="code-kw">this</span>.lives = <span class="code-num">5</span>;
+    <span class="code-kw">this</span>.wave = <span class="code-num">1</span>;
+  }
+
+  init() {
+    <span class="code-kw">this</span>.spawnAsteroids(<span class="code-num">5</span> + <span class="code-kw">this</span>.wave * <span class="code-num">2</span>);
+    <span class="code-kw">this</span>.bindControls();
+    <span class="code-kw">this</span>.gameLoop();
+  }
+
+  spawnAsteroids(count) {
+    <span class="code-kw">for</span> (<span class="code-kw">let</span> i = <span class="code-num">0</span>; i &lt; count; i++) {
+      <span class="code-kw">this</span>.asteroids.push({
+        x: Math.random() * <span class="code-kw">this</span>.canvas.width,
+        y: -Math.random() * <span class="code-num">200</span>,
+        size: <span class="code-num">12</span> + Math.random() * <span class="code-num">20</span>,
+        speed: <span class="code-num">1</span> + Math.random() * <span class="code-num">2</span>,
+        rotation: Math.random() * Math.PI * <span class="code-num">2</span>
+      });
+    }
+  }
+
+  spawnWave() {
+    <span class="code-kw">const</span> enemies = <span class="code-num">3</span> + <span class="code-kw">this</span>.wave * <span class="code-num">2</span>;
+    <span class="code-kw">for</span> (<span class="code-kw">let</span> i = <span class="code-num">0</span>; i &lt; enemies; i++) {
+      <span class="code-kw">const</span> type = <span class="code-kw">this</span>.wave &gt;= <span class="code-num">3</span> ? <span class="code-str">'boss'</span> : <span class="code-str">'patrol'</span>;
+      <span class="code-kw">this</span>.enemies.push({
+        x: Math.random() * <span class="code-kw">this</span>.canvas.width,
+        y: -<span class="code-num">40</span> - i * <span class="code-num">50</span>,
+        type, hp: type === <span class="code-str">'boss'</span> ? <span class="code-num">15</span> : <span class="code-num">2</span>,
+      });
+    }
+  }
+
+  <span class="code-cm">// ... 120+ more lines</span>
+  <span class="code-cm">// Auto-generated by VibePlay AI</span>
+}
+
+<span class="code-kw">const</span> game = <span class="code-kw">new</span> SpaceShooter(document.getElementById(<span class="code-str">'gameCanvas'</span>));
+game.init();</div>
+        </div>
+
+        <!-- Assets Tab -->
+        <div id="tab-assets" class="flex-1 overflow-auto p-4" style="display:none">
+          <div class="text-xs font-mono text-text-muted mb-4">生成的游戏资源 — 12 个文件</div>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3" id="assetsGrid"></div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="px-4 py-3 border-t border-border-card flex flex-wrap items-center justify-between gap-3">
+          <div class="flex gap-2">
+            <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="showToast('游戏已发布! 🎮 链接已复制到剪贴板');playMelody('publish')">📤 发布</button>
+            <button class="btn-secondary px-4 py-2 rounded-lg text-sm" onclick="showToast('链接已复制! 🔗');playMelody('click')">🔗 分享</button>
+          </div>
+          <div class="flex gap-4 text-[10px] font-mono text-text-muted">
+            <span>太空射击</span>
+            <span>Canvas2D</span>
+            <span>800×600</span>
+            <span class="hidden sm:inline">60fps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== COMMUNITY PAGE ======================== -->
+<div id="page-community" class="page">
+  <div class="relative z-10 pt-24 pb-16">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6">
+      <h1 class="text-3xl sm:text-4xl font-bold mb-2">探索社区游戏</h1>
+      <p class="text-text-secondary mb-6">发现、试玩、Remix 其他创作者的作品</p>
+
+      <!-- Search Bar (full width, before tabs) -->
+      <div class="mb-6">
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none">🔍</span>
+          <input type="text" placeholder="搜索游戏、创作者或标签..." class="w-full bg-bg-card border border-border-card rounded-lg pl-12 pr-4 py-3.5 text-sm text-text-primary placeholder-text-muted focus:border-neon transition-colors" oninput="filterGames(this.value)">
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-6 border-b border-border-card mb-6 overflow-x-auto">
+        <button class="community-tab tab-active pb-3 text-sm whitespace-nowrap" onclick="switchCommunityTab(this,'hot')">🔥 热门</button>
+        <button class="community-tab pb-3 text-sm text-text-secondary whitespace-nowrap" onclick="switchCommunityTab(this,'new')">✨ 最新</button>
+        <button class="community-tab pb-3 text-sm text-text-secondary whitespace-nowrap" onclick="switchCommunityTab(this,'featured')">⭐ 精选</button>
+        <button class="community-tab pb-3 text-sm text-text-secondary whitespace-nowrap" onclick="switchCommunityTab(this,'leaderboard')">🏆 排行榜</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-2 mb-8" id="communityFilters">
+        <button class="pill-filter active px-4 py-1.5 rounded-full bg-neon text-bg text-xs font-semibold" onclick="filterCategory(this,'all')">全部</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'shooter')">射击</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'platform')">平台跳跃</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'card')">卡牌</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'story')">互动小说</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'puzzle')">解谜</button>
+        <button class="pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs" onclick="filterCategory(this,'td')">塔防</button>
+      </div>
+
+      <!-- Skeleton Loading -->
+      <div id="communitySkeleton" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5" style="display:none">
+        <div class="bg-bg-card rounded-xl overflow-hidden border border-border-card">
+          <div class="skeleton h-40"></div>
+          <div class="p-4 space-y-2">
+            <div class="skeleton h-4 rounded w-3/4"></div>
+            <div class="skeleton h-3 rounded w-1/2"></div>
+            <div class="skeleton h-3 rounded w-full mt-3"></div>
+          </div>
+        </div>
+        <div class="bg-bg-card rounded-xl overflow-hidden border border-border-card">
+          <div class="skeleton h-40"></div>
+          <div class="p-4 space-y-2"><div class="skeleton h-4 rounded w-3/4"></div><div class="skeleton h-3 rounded w-1/2"></div><div class="skeleton h-3 rounded w-full mt-3"></div></div>
+        </div>
+        <div class="bg-bg-card rounded-xl overflow-hidden border border-border-card hidden sm:block">
+          <div class="skeleton h-40"></div>
+          <div class="p-4 space-y-2"><div class="skeleton h-4 rounded w-3/4"></div><div class="skeleton h-3 rounded w-1/2"></div><div class="skeleton h-3 rounded w-full mt-3"></div></div>
+        </div>
+        <div class="bg-bg-card rounded-xl overflow-hidden border border-border-card hidden lg:block">
+          <div class="skeleton h-40"></div>
+          <div class="p-4 space-y-2"><div class="skeleton h-4 rounded w-3/4"></div><div class="skeleton h-3 rounded w-1/2"></div><div class="skeleton h-3 rounded w-full mt-3"></div></div>
+        </div>
+      </div>
+
+      <!-- Game Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5" id="communityGrid"></div>
+
+      <!-- Load More -->
+      <div class="text-center mt-10" id="loadMoreContainer">
+        <button id="loadMoreBtn" class="px-8 py-3 rounded-lg text-sm border border-border-card text-text-secondary hover:border-neon hover:text-neon transition-all" onclick="loadMore()">加载更多游戏 ↓</button>
+      </div>
+    </section>
+  </div>
+</div>
+<!-- ======================== PRICING PAGE ======================== -->
+<div id="page-pricing" class="page">
+  <div class="relative z-10 pt-24 pb-16">
+    <section class="max-w-5xl mx-auto px-4 sm:px-6">
+      <h1 class="text-3xl sm:text-4xl font-bold text-center mb-4">选择适合你的方案</h1>
+      <p class="text-text-secondary text-center mb-12">所有方案都包含核心 AI 游戏生成功能</p>
+
+      <!-- Same pricing cards -->
+      <div class="grid sm:grid-cols-3 gap-5 mb-16">
+        <div class="bg-bg-card border border-border-card rounded-xl p-6 flex flex-col">
+          <h3 class="text-lg font-semibold mb-1">Free</h3>
+          <p class="text-text-secondary text-sm mb-4">适合尝鲜和学习</p>
+          <p class="text-3xl font-bold mb-6">¥0 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 3 个项目/月</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 社区发布</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 基础 AI 模型</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 基础音效</li>
+            <li class="flex items-start gap-2"><span class="text-text-muted mt-0.5">✗</span> <span class="text-text-muted">带 VibePlay 水印</span></li>
+            <li class="flex items-start gap-2"><span class="text-text-muted mt-0.5">✗</span> <span class="text-text-muted">无源码导出</span></li>
+          </ul>
+          <button class="btn-secondary w-full py-3 rounded-lg text-sm" onclick="navigateTo('builder')">免费开始</button>
+        </div>
+        <div class="bg-bg-card border-2 border-neon rounded-xl p-6 flex flex-col relative neon-glow">
+          <div class="popular-badge">最受欢迎</div>
+          <h3 class="text-lg font-semibold mb-1">Pro</h3>
+          <p class="text-text-secondary text-sm mb-4">适合独立创作者</p>
+          <p class="text-3xl font-bold mb-6">¥49 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 无限项目</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 去水印</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 高级 AI 模型</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> AI 音乐生成</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 自定义域名</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 源码导出</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 优先生成队列</li>
+          </ul>
+          <button class="btn-primary w-full py-3 rounded-lg text-sm" onclick="showToast('即将开放!')">升级 Pro</button>
+        </div>
+        <div class="bg-bg-card border border-border-card rounded-xl p-6 flex flex-col">
+          <h3 class="text-lg font-semibold mb-1">Team</h3>
+          <p class="text-text-secondary text-sm mb-4">适合团队和教育机构</p>
+          <p class="text-3xl font-bold mb-6">¥149 <span class="text-sm font-normal text-text-muted">/月</span></p>
+          <ul class="space-y-3 text-sm text-text-secondary mb-8 flex-1">
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 一切 Pro 功能</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 5 人协作编辑</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 私有项目</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> API 访问</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 优先支持</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> 数据分析面板</li>
+            <li class="flex items-start gap-2"><span class="text-neon mt-0.5">✓</span> SSO 集成</li>
+          </ul>
+          <button class="btn-secondary w-full py-3 rounded-lg text-sm" onclick="showToast('联系 team@vibeplay.ai')">联系销售</button>
+        </div>
+      </div>
+
+      <!-- Feature Comparison -->
+      <div class="bg-bg-card border border-border-card rounded-xl overflow-hidden">
+        <div class="p-6 border-b border-border-card">
+          <h3 class="text-lg font-semibold">功能对比</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-border-card text-text-secondary">
+                <th class="text-left px-6 py-3 font-normal">功能</th>
+                <th class="px-6 py-3 font-normal">Free</th>
+                <th class="px-6 py-3 font-normal text-neon">Pro</th>
+                <th class="px-6 py-3 font-normal">Team</th>
+              </tr>
+            </thead>
+            <tbody class="text-text-secondary">
+              <tr class="border-b border-border-card"><td class="px-6 py-3">项目数量</td><td class="px-6 py-3 text-center">3/月</td><td class="px-6 py-3 text-center text-neon">无限</td><td class="px-6 py-3 text-center">无限</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">AI 模型</td><td class="px-6 py-3 text-center">基础</td><td class="px-6 py-3 text-center text-neon">高级</td><td class="px-6 py-3 text-center">高级</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">AI 音乐</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center text-neon">✓</td><td class="px-6 py-3 text-center">✓</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">自定义域名</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center text-neon">✓</td><td class="px-6 py-3 text-center">✓</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">源码导出</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center text-neon">✓</td><td class="px-6 py-3 text-center">✓</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">协作编辑</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center">5 人</td></tr>
+              <tr class="border-b border-border-card"><td class="px-6 py-3">API 访问</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center">—</td><td class="px-6 py-3 text-center">✓</td></tr>
+              <tr><td class="px-6 py-3">技术支持</td><td class="px-6 py-3 text-center">社区</td><td class="px-6 py-3 text-center text-neon">邮件</td><td class="px-6 py-3 text-center">优先</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+
+<!-- ======================== JAVASCRIPT ======================== -->
+<script>
+// ===== AUDIO =====
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+function playNote(freq, dur=0.08, type='square', vol=0.04) {
+  try {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, AC.currentTime);
+    g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
+    o.connect(g).connect(AC.destination);
+    o.start(); o.stop(AC.currentTime + dur);
+  } catch(e) {}
+}
+function playMelody(kind) {
+  const melodies = {
+    start: [[523,0.1],[659,0.1],[784,0.15]],
+    publish: [[784,0.1],[988,0.1],[1175,0.15]],
+    click: [[660,0.06]],
+    nav: [[520,0.05]],
+  };
+  const m = melodies[kind] || melodies.click;
+  m.forEach(([f,d],i) => setTimeout(() => playNote(f,d), i*100));
+}
+
+// ===== PARTICLES =====
+const pC = document.getElementById('particles');
+const pX = pC.getContext('2d');
+let pts = [];
+function resizeP() { pC.width = innerWidth; pC.height = innerHeight; }
+resizeP(); addEventListener('resize', resizeP);
+for (let i = 0; i < 45; i++) pts.push({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, vx:(Math.random()-.5)*.2, vy:(Math.random()-.5)*.2, s:Math.random()*1.5+.5, a:Math.random()*.3+.05 });
+function drawP() {
+  pX.clearRect(0,0,pC.width,pC.height);
+  pts.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0)p.x=pC.width; if(p.x>pC.width)p.x=0;
+    if(p.y<0)p.y=pC.height; if(p.y>pC.height)p.y=0;
+    pX.beginPath(); pX.arc(p.x,p.y,p.s,0,Math.PI*2);
+    pX.fillStyle=`rgba(57,255,20,${p.a})`; pX.fill();
+  });
+  for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++) {
+    const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+    if(d<100) { pX.beginPath(); pX.moveTo(pts[i].x,pts[i].y); pX.lineTo(pts[j].x,pts[j].y); pX.strokeStyle=`rgba(57,255,20,${.04*(1-d/100)})`; pX.lineWidth=.5; pX.stroke(); }
+  }
+  requestAnimationFrame(drawP);
+}
+drawP();
+
+// ===== ROUTING =====
+function navigateTo(p) { location.hash = '/'+p; }
+function handleRoute() {
+  const h = location.hash||'#/';
+  const r = h.replace('#','').replace('/','');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageId = r === 'builder' ? 'page-builder' : r === 'community' ? 'page-community' : r === 'pricing' ? 'page-pricing' : 'page-landing';
+  document.getElementById(pageId).classList.add('active');
+  if(r==='builder') {
+    if (!hasGenerated) { initGame(); }
+    document.getElementById('genStepper').style.display='block';
+    document.getElementById('gameDNA').style.display='flex';
+    // Check for pending prompt from landing page
+    const pending = sessionStorage.getItem('vibeplay_pending_prompt');
+    if (pending) {
+      sessionStorage.removeItem('vibeplay_pending_prompt');
+      // Skip scripted chat, go straight to real generation
+      const container = document.getElementById('chatMessages');
+      if (container) container.innerHTML = '';
+      chatInited = true;
+      setTimeout(() => {
+        const input = document.getElementById('chatInput');
+        if (input) { input.value = pending; sendChat(); }
+      }, 300);
+    } else {
+      initChat();
+    }
+  }
+  if(r==='community') renderCommunity();
+  if(!r||r==='') { renderHotGames(); initCounters(); initMockup(); }
+  playMelody('nav');
+  window.scrollTo(0,0);
+  initRevealObserver();
+}
+addEventListener('hashchange', handleRoute);
+addEventListener('load', handleRoute);
+
+// ===== MOBILE MENU =====
+function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('open'); playMelody('click'); }
+
+// ===== LOGIN MODAL =====
+function showLogin() { document.getElementById('loginModal').classList.add('show'); playMelody('click'); }
+function hideLogin() { document.getElementById('loginModal').classList.remove('show'); }
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== RIPPLE =====
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary,.btn-secondary');
+  if(!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const size = Math.max(rect.width,rect.height);
+  ripple.style.width = ripple.style.height = size+'px';
+  ripple.style.left = (e.clientX-rect.left-size/2)+'px';
+  ripple.style.top = (e.clientY-rect.top-size/2)+'px';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 500);
+});
+
+// ===== SCROLL REVEAL =====
+function initRevealObserver() {
+  if(!('IntersectionObserver' in window)) return; // elements already visible by default
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if(rect.top > window.innerHeight + 100) {
+      el.classList.add('reveal-init');
+    } else {
+      el.classList.add('visible');
+    }
+    obs.observe(el);
+  });
+}
+
+// ===== COUNTERS =====
+let countersInit = false;
+function initCounters() {
+  if(countersInit) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) {
+        countersInit = true;
+        document.querySelectorAll('.count-up').forEach(el => {
+          const target = parseInt(el.dataset.target);
+          const start = performance.now();
+          const dur = 2000;
+          function step(now) {
+            const p = Math.min((now-start)/dur, 1);
+            const eased = 1-Math.pow(1-p, 3);
+            el.textContent = Math.floor(eased*target).toLocaleString();
+            if(p<1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.count-up').forEach(el => obs.observe(el.closest('section')||el));
+}
+
+// ===== GAME DATA =====
+const avatarColors = ['#FF6B6B','#4ECDC4','#45B7D1','#A78BFA','#F093FB','#FBBF24','#34D399','#F472B6','#818CF8','#FB923C'];
+const genreBadges = {'射击':'射击','平台':'平台','卡牌':'卡牌','解谜':'解谜','塔防':'塔防','互动小说':'冒险','RPG':'RPG','街机':'街机'};
+const timeAgo = ['3小时前','5小时前','昨天','2天前','3天前','上周','2周前','1个月前'];
+
+const allGames = [
+  { title:'星际迷航：像素之旅', author:'宇宙猫', plays:8420, remixes:342, likes:1200, icon:'🚀', genre:'射击', rating:4.8, created:0, featured:true, img:'covers/star-trek.jpg' },
+  { title:'量子弹珠台', author:'物理怪咖', plays:6210, remixes:189, likes:890, icon:'⚡', genre:'街机', rating:4.5, created:1, img:'covers/quantum-pinball.jpg' },
+  { title:'像素武士道', author:'竹林剑客', plays:15600, remixes:721, likes:3400, icon:'⚔️', genre:'平台', rating:4.9, created:2, featured:true, img:'covers/pixel-samurai.jpg' },
+  { title:'猫咪收集大作战', author:'橘座', plays:22300, remixes:1050, likes:5200, icon:'🐱', genre:'解谜', rating:4.7, created:3, featured:true, img:'covers/cat-collector.jpg' },
+  { title:'赛博面馆', author:'拉面黑客', plays:9870, remixes:456, likes:1800, icon:'🍜', genre:'互动小说', rating:4.6, created:4, img:'covers/cyber-noodle.jpg' },
+  { title:'时间循环侦探', author:'莫比乌斯', plays:7340, remixes:278, likes:1100, icon:'🔍', genre:'互动小说', rating:4.4, created:5, img:'covers/time-detective.jpg' },
+  { title:'地牢酒保', author:'调酒师NPC', plays:11200, remixes:530, likes:2100, icon:'🍸', genre:'RPG', rating:4.8, created:6, featured:true, img:'covers/dungeon-bartender.jpg' },
+  { title:'合成器大逃杀', author:'电音萝卜', plays:5430, remixes:167, likes:780, icon:'🎹', genre:'街机', rating:4.3, created:7, img:'covers/synth-royale.jpg' },
+  { title:'植物塔防：春日版', author:'园丁007', plays:18900, remixes:890, likes:4100, icon:'🌱', genre:'塔防', rating:4.9, created:2, img:'covers/plant-defense.jpg' },
+  { title:'无尽走廊', author:'背包客', plays:4560, remixes:134, likes:560, icon:'🚪', genre:'解谜', rating:4.2, created:0, img:'covers/endless-corridor.jpg' },
+  { title:'机甲料理王', author:'铁锅侠', plays:13400, remixes:623, likes:2800, icon:'🤖', genre:'街机', rating:4.7, created:1, img:'covers/mecha-chef.jpg' },
+  { title:'影子棋局', author:'暗子', plays:6780, remixes:245, likes:920, icon:'♟️', genre:'卡牌', rating:4.5, created:3, img:'covers/shadow-chess.jpg' },
+  { title:'月球快递员', author:'太空邮差', plays:3200, remixes:98, likes:340, icon:'📦', genre:'平台', rating:4.1, created:4, img:'covers/moon-courier.jpg' },
+  { title:'方块交响乐', author:'节拍大师', plays:9100, remixes:412, likes:1500, icon:'🎵', genre:'解谜', rating:4.6, created:5, img:'covers/block-symphony.jpg' },
+  { title:'深海信号', author:'潜水艇长', plays:7800, remixes:356, likes:1200, icon:'🐙', genre:'互动小说', rating:4.4, created:6, img:'covers/deep-sea-signal.jpg' },
+  { title:'纸飞机大冒险', author:'折纸少年', plays:14500, remixes:670, likes:3100, icon:'✈️', genre:'平台', rating:4.8, created:7, img:'covers/paper-plane.jpg' },
+];
+
+// Extra games for load more
+const extraGames = [
+  { title:'像素赛车场', author:'飙车手X', plays:4320, remixes:156, likes:620, icon:'🏎️', genre:'街机', rating:4.3, created:2 },
+  { title:'幽灵图书馆', author:'夜读者', plays:7890, remixes:234, likes:980, icon:'👻', genre:'解谜', rating:4.6, created:1 },
+  { title:'星际牧场', author:'太空牛仔', plays:5670, remixes:189, likes:730, icon:'🌾', genre:'RPG', rating:4.4, created:5 },
+  { title:'节奏忍者', author:'鼓点大师', plays:11200, remixes:445, likes:1900, icon:'🥷', genre:'街机', rating:4.7, created:3 },
+];
+
+function fmt(n) { return n>=10000?(n/10000).toFixed(1)+'万':n>=1000?(n/1000).toFixed(1)+'k':n; }
+function starHTML(r) {
+  let s='';
+  for(let i=1;i<=5;i++) s+=`<span class="star${i<=Math.round(r)?' filled':''}">★</span>`;
+  return s;
+}
+function hashColor(str) {
+  let h=0; for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  return avatarColors[Math.abs(h)%avatarColors.length];
+}
+
+function gameCardHTML(g, showFeatured=false) {
+  const ac = hashColor(g.author);
+  const initial = g.author.charAt(0);
+  const ta = timeAgo[g.created % timeAgo.length];
+  const badge = genreBadges[g.genre]||g.genre;
+  return `
+    <div class="game-card bg-bg-card border border-border-card rounded-xl overflow-hidden cursor-pointer" onclick="navigateTo('builder');playMelody('click')">
+      <div class="relative h-40 overflow-hidden group">
+        <img src="${g.img}" alt="${g.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="absolute inset-0 bg-[#0a0a10] items-center justify-center text-5xl" style="display:none">${g.icon}</div>
+        ${showFeatured && g.featured ? '<div class="absolute top-2 left-2 bg-neon text-bg text-[10px] font-bold px-2 py-0.5 rounded-full z-10">⭐ 精选</div>' : ''}
+        <div class="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full z-10" style="background:rgba(57,255,20,0.15);color:#39FF14;border:1px solid rgba(57,255,20,0.3)">${badge}</div>
+      </div>
+      <div class="p-4">
+        <h3 class="font-semibold text-sm mb-2 truncate">${g.title}</h3>
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0" style="background:${ac}">${initial}</div>
+          <span class="text-text-secondary text-xs truncate">@${g.author}</span>
+          <span class="text-text-muted text-[10px] ml-auto flex-shrink-0">${ta}</span>
+        </div>
+        <div class="flex items-center gap-1 mb-3 text-xs">${starHTML(g.rating)}<span class="text-text-muted ml-1">${g.rating}</span></div>
+        <div class="flex items-center justify-between">
+          <div class="flex gap-3 text-[11px] text-text-secondary font-mono">
+            <span>▶ ${fmt(g.plays)}</span>
+            <span>❤️ ${fmt(g.likes)}</span>
+            <span>🔀 ${fmt(g.remixes)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderHotGames() {
+  const el = document.getElementById('hotGames');
+  if(el) { el.innerHTML = allGames.slice(0,8).map(g => gameCardHTML(g, true)).join(''); initMiniCanvases(el); }
+}
+
+// ===== COMMUNITY =====
+let currentSort = 'hot';
+let currentFilter = 'all';
+let loadMoreUsed = false;
+
+function renderCommunity() {
+  const el = document.getElementById('communityGrid');
+  const sk = document.getElementById('communitySkeleton');
+  if(!el) return;
+  loadMoreUsed = false;
+  const btn = document.getElementById('loadMoreBtn');
+  if(btn) { btn.textContent = '加载更多游戏 ↓'; btn.disabled = false; }
+  sk.style.display = 'grid'; el.style.display = 'none';
+  setTimeout(() => {
+    sk.style.display = 'none'; el.style.display = 'grid';
+    let games = [...allGames];
+    if(currentFilter !== 'all') {
+      const map = {shooter:'射击',platform:'平台',card:'卡牌',story:'互动小说',puzzle:'解谜',td:'塔防'};
+      games = games.filter(g => g.genre === (map[currentFilter]||currentFilter));
+    }
+    if(currentSort === 'hot') games.sort((a,b) => b.plays - a.plays);
+    else if(currentSort === 'new') games.sort((a,b) => a.created - b.created);
+    else if(currentSort === 'featured') games = games.filter(g => g.featured);
+    else if(currentSort === 'leaderboard') games.sort((a,b) => b.likes - a.likes);
+    el.innerHTML = games.map(g => gameCardHTML(g, currentSort==='featured')).join('');
+    initMiniCanvases(el);
+  }, 600);
+}
+
+function switchCommunityTab(el, sort) {
+  document.querySelectorAll('.community-tab').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-text-secondary'); });
+  el.classList.add('tab-active'); el.classList.remove('text-text-secondary');
+  currentSort = sort; renderCommunity(); playMelody('click');
+}
+
+function filterCategory(el, cat) {
+  document.querySelectorAll('.pill-filter').forEach(p => { p.className='pill-filter px-4 py-1.5 rounded-full bg-bg-card border border-border-card text-text-secondary text-xs'; });
+  el.className='pill-filter active px-4 py-1.5 rounded-full bg-neon text-bg text-xs font-semibold';
+  currentFilter = cat; renderCommunity(); playMelody('click');
+}
+
+function filterGames(query) {
+  if(!query) { renderCommunity(); return; }
+  const q = query.toLowerCase();
+  const el = document.getElementById('communityGrid');
+  const filtered = allGames.filter(g => g.title.toLowerCase().includes(q) || g.author.toLowerCase().includes(q) || g.genre.includes(q));
+  el.innerHTML = filtered.map(g => gameCardHTML(g)).join('');
+  initMiniCanvases(el);
+}
+
+function loadMore() {
+  if(loadMoreUsed) { showToast('已经到底啦 😊'); playMelody('click'); return; }
+  const btn = document.getElementById('loadMoreBtn');
+  btn.textContent = '加载中...'; btn.disabled = true;
+  // Show skeleton cards at bottom
+  const el = document.getElementById('communityGrid');
+  const skeletons = [];
+  for(let i=0;i<4;i++) {
+    const sk = document.createElement('div');
+    sk.className = 'bg-bg-card rounded-xl overflow-hidden border border-border-card';
+    sk.innerHTML = '<div class="skeleton h-40"></div><div class="p-4 space-y-2"><div class="skeleton h-4 rounded w-3/4"></div><div class="skeleton h-3 rounded w-1/2"></div><div class="skeleton h-3 rounded w-full mt-3"></div></div>';
+    el.appendChild(sk);
+    skeletons.push(sk);
+  }
+  setTimeout(() => {
+    skeletons.forEach(s => s.remove());
+    extraGames.forEach(g => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = gameCardHTML(g);
+      const card = wrapper.firstElementChild;
+      card.style.opacity='0'; card.style.transform='translateY(10px)';
+      el.appendChild(card);
+      initMiniCanvases(card.parentElement || el);
+      setTimeout(() => { card.style.transition='all .3s ease'; card.style.opacity='1'; card.style.transform='translateY(0)'; }, 50);
+    });
+    btn.textContent = '没有更多了';
+    loadMoreUsed = true;
+    playMelody('click');
+  }, 1200);
+}
+
+// ===== MINI CANVAS ANIMATIONS =====
+function initMiniCanvases(container) {
+  container.querySelectorAll('.mini-canvas').forEach(c => {
+    if(c._inited) return; c._inited = true;
+    c.width = 200; c.height = 160;
+    const ctx = c.getContext('2d');
+    const type = c.dataset.type;
+    let frame = Math.random()*1000;
+    function draw() {
+      ctx.clearRect(0,0,200,160);
+      frame += 0.02;
+      if(type==='射击'||type==='街机') {
+        for(let i=0;i<15;i++) {
+          const y = ((i*12+frame*30)%180)-10;
+          ctx.fillStyle='rgba(57,255,20,0.08)';
+          ctx.fillRect(Math.sin(i*2.3+frame)*80+100, y, 1.5, 1.5);
+        }
+      } else if(type==='平台') {
+        for(let i=0;i<4;i++) {
+          ctx.fillStyle='rgba(57,255,20,0.06)';
+          ctx.fillRect(i*55+Math.sin(frame+i)*5, 120-i*20, 40, 4);
+        }
+      } else if(type==='解谜'||type==='卡牌') {
+        for(let i=0;i<6;i++) {
+          ctx.strokeStyle='rgba(57,255,20,0.05)';
+          ctx.strokeRect(40+Math.cos(frame+i)*20, 40+Math.sin(frame+i*1.3)*20, 16, 16);
+        }
+      } else {
+        for(let i=0;i<8;i++) {
+          ctx.fillStyle='rgba(57,255,20,0.04)';
+          ctx.beginPath(); ctx.arc(Math.sin(frame+i*0.8)*60+100, Math.cos(frame+i*1.1)*40+80, 2, 0, Math.PI*2); ctx.fill();
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  });
+}
+
+// ===== CUSTOM SELECT =====
+function toggleCS(btn) {
+  const wrap = btn.closest('.custom-select');
+  const wasOpen = wrap.classList.contains('open');
+  document.querySelectorAll('.custom-select.open').forEach(s => s.classList.remove('open'));
+  if(!wasOpen) wrap.classList.add('open');
+  playMelody('click');
+}
+function pickCS(opt, val) {
+  const wrap = opt.closest('.custom-select');
+  const label = wrap.querySelector('.cs-label');
+  const defaultLabels = ['游戏类型','视觉风格','难度'];
+  label.textContent = val;
+  label.classList.toggle('text-neon', !defaultLabels.includes(val));
+  wrap.querySelectorAll('.cs-opt').forEach(o => o.classList.remove('selected'));
+  opt.classList.add('selected');
+  wrap.classList.remove('open');
+  playMelody('click');
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.custom-select')) {
+    document.querySelectorAll('.custom-select.open').forEach(s => s.classList.remove('open'));
+  }
+});
+
+// ===== LANDING INTERACTIONS =====
+function pickType(type, prompt) {
+  document.getElementById('heroTextarea').value = prompt;
+  const typeSelect = document.querySelector('[data-id="selType"]');
+  if(typeSelect) {
+    const label = typeSelect.querySelector('.cs-label');
+    label.textContent = type;
+    label.classList.add('text-neon');
+  }
+  playMelody('click');
+}
+
+function startBuildFromLanding() {
+  const textarea = document.getElementById('heroTextarea');
+  const pendingPrompt = textarea ? textarea.value.trim() : '';
+  if (pendingPrompt) {
+    sessionStorage.setItem('vibeplay_pending_prompt', pendingPrompt);
+  }
+  navigateTo('builder');
+  playMelody('start');
+}
+
+// ===== HERO MOCKUP ANIMATION =====
+let mockupInit = false;
+function initMockup() {
+  if(mockupInit) return;
+  mockupInit = true;
+  const steps = [
+    { icon:'✓', text:'意图解析', time:'0.8s' },
+    { icon:'✓', text:'游戏设计', time:'1.2s' },
+    { icon:'✓', text:'代码生成', time:'3.4s' },
+    { icon:'⚡', text:'素材创建', time:'生成中...' },
+  ];
+  const stepsEl = document.getElementById('mockSteps');
+  if(!stepsEl) return;
+  let i = 0;
+  function addStep() {
+    if(i >= steps.length) return;
+    const s = steps[i];
+    const isLast = i === steps.length-1;
+    const div = document.createElement('div');
+    div.className = `flex items-center gap-2 text-[11px] ${isLast?'text-neon':'text-text-secondary'}`;
+    div.style.opacity = '0'; div.style.transform = 'translateY(5px)';
+    div.innerHTML = `<span class="${isLast?'animate-pulse':''}">${s.icon}</span> ${s.text} <span class="ml-auto font-mono text-[10px] text-text-muted">${s.time}</span>`;
+    stepsEl.appendChild(div);
+    setTimeout(() => { div.style.transition='all .3s ease'; div.style.opacity='1'; div.style.transform='translateY(0)'; }, 50);
+    i++;
+    setTimeout(addStep, 600+Math.random()*400);
+  }
+  setTimeout(addStep, 1000);
+
+  const mc = document.getElementById('mockGameCanvas');
+  if(!mc) return;
+  mc.width = mc.offsetWidth * 2; mc.height = mc.offsetHeight * 2;
+  const mx = mc.getContext('2d');
+  let mf = 0;
+  const mStars = Array.from({length:30}, () => ({x:Math.random()*mc.width, y:Math.random()*mc.height, s:Math.random()*2+.5, sp:Math.random()*1.5+.5}));
+  function drawMock() {
+    mx.clearRect(0,0,mc.width,mc.height);
+    mf++;
+    mStars.forEach(s => {
+      s.y += s.sp;
+      if(s.y>mc.height){s.y=0;s.x=Math.random()*mc.width;}
+      mx.fillStyle=`rgba(240,237,230,${.3+Math.sin(mf*.02+s.s)*0.2})`;
+      mx.fillRect(s.x, s.y, s.s, s.s);
+    });
+    const sx=mc.width/2, sy=mc.height*.7;
+    mx.fillStyle='#39FF14';
+    mx.beginPath(); mx.moveTo(sx,sy-12); mx.lineTo(sx-10,sy+8); mx.lineTo(sx+10,sy+8); mx.closePath(); mx.fill();
+    mx.fillStyle=`rgba(57,255,20,${.3+Math.random()*.3})`;
+    mx.fillRect(sx-3,sy+8,6,4+Math.random()*4);
+    for(let i=0;i<3;i++) {
+      const by = (sy-20-(mf*3+i*60)%mc.height+mc.height)%mc.height;
+      if(by < sy-20) { mx.fillStyle='#39FF14'; mx.fillRect(sx-1, by, 2, 8); }
+    }
+    for(let i=0;i<4;i++) {
+      const ax = Math.sin(mf*.01+i*2)*mc.width*.3+mc.width/2;
+      const ay = ((mf*(.5+i*.3)+i*120)%mc.height);
+      mx.strokeStyle='rgba(57,255,20,0.3)'; mx.lineWidth=1.5;
+      mx.beginPath(); mx.arc(ax,ay,6+i*2,0,Math.PI*2); mx.stroke();
+    }
+    requestAnimationFrame(drawMock);
+  }
+  drawMock();
+}
+
+// ===== BUILDER CONTROLS =====
+function switchBuilderTab(el, tab) {
+  document.querySelectorAll('.builder-tab').forEach(t => { t.classList.remove('active'); t.classList.add('text-text-secondary'); });
+  el.classList.add('active'); el.classList.remove('text-text-secondary');
+  ['preview','code','assets'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab ? '' : 'none';
+  });
+  if(tab==='assets') renderAssets();
+  playMelody('click');
+}
+
+function renderAssets() {
+  const el = document.getElementById('assetsGrid');
+  if(!el || el.children.length > 0) return;
+  const assets = [
+    {name:'player_ship.png',color:'#39FF14',type:'Sprite'},
+    {name:'asteroid_01.png',color:'#888888',type:'Sprite'},
+    {name:'bg_stars.png',color:'#1a1a2e',type:'Background'},
+    {name:'laser_sfx.wav',color:'#A78BFA',type:'SFX'},
+    {name:'explosion.png',color:'#FF6B6B',type:'Sheet'},
+    {name:'powerup_shield.png',color:'#45B7D1',type:'Sprite'},
+    {name:'enemy_basic.png',color:'#ff5555',type:'Sprite'},
+    {name:'enemy_tracker.png',color:'#ff7744',type:'Sprite'},
+    {name:'bgm_space.mp3',color:'#34D399',type:'Music'},
+    {name:'ui_hud.png',color:'#FBBF24',type:'UI'},
+    {name:'particle_thrust.png',color:'#F093FB',type:'VFX'},
+    {name:'font_pixel.ttf',color:'#818CF8',type:'Font'},
+  ];
+  el.innerHTML = assets.map(a => `
+    <div class="bg-bg border border-border-card rounded-lg p-3 text-center hover:border-neon transition-colors cursor-pointer">
+      <div class="w-10 h-10 mx-auto rounded-lg mb-2 flex items-center justify-center" style="background:${a.color}20;border:1px solid ${a.color}40">
+        <div class="w-4 h-4 rounded-sm" style="background:${a.color}"></div>
+      </div>
+      <p class="text-[10px] text-text-secondary truncate">${a.name}</p>
+      <p class="text-[9px] text-text-muted">${a.type}</p>
+    </div>
+  `).join('');
+}
+
+function toggleStepper() {
+  const el = document.getElementById('genStepper');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+  playMelody('click');
+}
+
+function toggleDNA() {
+  const el = document.getElementById('gameDNA');
+  el.style.display = el.style.display==='none' ? 'flex' : 'none';
+}
+
+// ===== CHAT =====
+const chatScript = [
+  { role:'user', text:'帮我做一个太空射击游戏，像素风，有多种敌人和 Boss 战' },
+  { role:'progress', steps:['意图解析','游戏设计','代码生成','素材创建','音效合成','QA 测试'] },
+  { role:'ai', text:'🎮 **太空射击游戏**已生成！\n\n包含功能：\n• 🚀 飞船控制 — 方向键/WASD/触屏\n• 💥 射击系统 — 空格连发\n• 👾 3 种敌人类型（巡逻、追踪、Boss）\n• ⚡ 能量道具（护盾、快速射击、额外生命）\n• 🏆 波次系统 + 分数排行\n\n试试操控飞船！有什么想调整的随时说。' },
+];
+let chatIdx = 0, chatInited = false;
+
+function initChat() {
+  if(chatInited) return;
+  chatInited = true;
+  document.getElementById('chatMessages').innerHTML = '';
+  chatIdx = 0;
+  showNext();
+}
+
+function showNext() {
+  if(chatIdx >= chatScript.length) return;
+  const msg = chatScript[chatIdx];
+  const container = document.getElementById('chatMessages');
+  if(msg.role === 'progress') { chatIdx++; setTimeout(showNext, 300); return; }
+  if(msg.role === 'ai') {
+    const typing = document.createElement('div');
+    typing.className = 'flex gap-2 items-start';
+    typing.innerHTML = `<div class="w-7 h-7 rounded-full bg-neon/20 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">⚛</div>
+      <div class="chat-ai px-4 py-3 max-w-[85%]"><div class="flex gap-1.5"><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div></div></div>`;
+    container.appendChild(typing);
+    container.scrollTop = container.scrollHeight;
+    setTimeout(() => { typing.remove(); addMsg(msg.role, msg.text); chatIdx++; setTimeout(showNext, 500); }, 1500);
+  } else {
+    addMsg(msg.role, msg.text);
+    chatIdx++;
+    setTimeout(showNext, 700);
+  }
+}
+
+function addMsg(role, text) {
+  const c = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  let html = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  if(role==='user') {
+    div.className = 'flex justify-end';
+    div.innerHTML = `<div class="chat-user px-4 py-3 max-w-[85%] text-sm">${html}</div>`;
+  } else {
+    div.className = 'flex gap-2 items-start';
+    div.innerHTML = `<div class="w-7 h-7 rounded-full bg-neon/20 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">⚛</div>
+      <div class="chat-ai px-4 py-3 max-w-[85%] text-sm leading-relaxed">${html}</div>`;
+  }
+  div.style.opacity='0'; div.style.transform='translateY(10px)';
+  c.appendChild(div);
+  setTimeout(() => { div.style.transition='all .3s ease'; div.style.opacity='1'; div.style.transform='translateY(0)'; }, 30);
+  c.scrollTop = c.scrollHeight;
+  playNote(role==='user'?880:660, 0.05);
+}
+
+// ===== GEMINI API INTEGRATION =====
+let conversationHistory = [];
+let isGenerating = false;
+let lastGeneratedCode = '';
+let hasGenerated = false;
+
+function getApiKey() {
+  return localStorage.getItem('vibeplay_api_key') || '';
+}
+function setApiKey(key) {
+  localStorage.setItem('vibeplay_api_key', key.trim());
+}
+function promptApiKey() {
+  const current = getApiKey();
+  const msg = current ? '更新你的 Gemini API Key:' : '请输入 Gemini API Key 以启用 AI 游戏生成:';
+  const key = prompt(msg, current);
+  if (key !== null && key.trim()) {
+    setApiKey(key);
+    showToast('API Key 已保存 ✅');
+    return true;
+  }
+  return false;
+}
+
+async function generateGame(prompt, history) {
+  let apiKey = getApiKey();
+  if (!apiKey) {
+    if (!promptApiKey()) throw new Error('需要 API Key 才能生成游戏。点击右上角 ⚙️ 设置。');
+    apiKey = getApiKey();
+  }
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const url = isLocal 
+    ? 'http://localhost:8903/' 
+    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  const systemPrompt = `You are VibePlay AI, a game creation engine. Generate a COMPLETE, SINGLE-FILE HTML game based on the user's description.
+
+RULES:
+- Output ONLY the HTML code, no explanations, no markdown code blocks
+- The game must be a complete <!DOCTYPE html> document
+- Use Canvas API or plain DOM for rendering (no external libraries)
+- The game must be playable immediately on load
+- Support both keyboard (arrow keys, WASD, space) and touch/click controls
+- Use vibrant colors on dark background (#0F0F14 or similar dark bg)
+- Include a score/progress system
+- Add simple sound effects using Web Audio API (square/sine wave beeps)
+- Make it responsive (use window.innerWidth/innerHeight)
+- Include a title screen or HUD showing the game name
+- Keep file size under 15KB
+- The game should be FUN and polished, not a bare minimum demo
+- Use requestAnimationFrame for smooth animation at 60fps
+- Add particle effects where appropriate (explosions, trails, etc.)
+
+If the user asks to modify an existing game, output the COMPLETE modified HTML (not just the changes).`;
+
+  const contents = [];
+  for (const msg of history) {
+    contents.push({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }]
+    });
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: contents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 16384,
+      }
+    })
+  });
+
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
+  const data = await response.json();
+  if (!data.candidates || !data.candidates[0]) throw new Error('No response from API');
+  return data.candidates[0].content.parts[0].text;
+}
+
+function extractHTML(text) {
+  // Strip markdown code fences if present
+  let code = text;
+  const fenceMatch = code.match(/```(?:html)?\s*\n?([\s\S]*?)```/);
+  if (fenceMatch) code = fenceMatch[1];
+  code = code.trim();
+  // Ensure it starts with <!DOCTYPE or <html
+  if (!code.toLowerCase().startsWith('<!doctype') && !code.toLowerCase().startsWith('<html')) {
+    // Try to find the HTML start
+    const idx = code.toLowerCase().indexOf('<!doctype');
+    if (idx > -1) code = code.substring(idx);
+    else {
+      const idx2 = code.toLowerCase().indexOf('<html');
+      if (idx2 > -1) code = code.substring(idx2);
+    }
+  }
+  return code;
+}
+
+function animateStepper() {
+  const stepItems = document.querySelectorAll('#genStepper .gen-step-item');
+  if (stepItems.length === 0) return null;
+
+  // Reset all steps to pending
+  stepItems.forEach(item => {
+    item.className = item.className.replace(/\b(done|running|pending)\b/g, '').trim() + ' pending';
+    const dot = item.querySelector('.step-dot');
+    if (dot) {
+      dot.style.background = '#1A1A24';
+      dot.style.border = '2px solid #2A2A34';
+      dot.style.animation = '';
+    }
+    const title = item.querySelector('[style*="font-size:12px"]');
+    if (title) title.style.color = '#555';
+    const timeEl = item.querySelectorAll('[style*="font-family"]');
+    timeEl.forEach(t => { if(t.style.fontSize==='10px' || t.textContent.match(/[\d.]+s|\.\.\.|-/)) t.textContent = '-'; t.style.color = '#555'; });
+    // Reset connector lines
+    const connector = item.querySelector('div[style*="width:2px"]');
+    if (connector) connector.style.background = '#2A2A34';
+  });
+
+  let i = 0;
+  const startTime = Date.now();
+  const interval = setInterval(() => {
+    // Mark previous step as done
+    if (i > 0 && stepItems[i-1]) {
+      const prev = stepItems[i-1];
+      prev.className = prev.className.replace(/\b(pending|running)\b/g, '').trim() + ' done';
+      const dot = prev.querySelector('.step-dot');
+      if (dot) { dot.style.background = 'rgba(57,255,20,0.15)'; dot.style.border = '2px solid #39FF14'; dot.style.animation = ''; }
+      const title = prev.querySelector('[style*="font-size:12px"]');
+      if (title) title.style.color = '#39FF14';
+      const timeEl = prev.querySelectorAll('[style*="font-family"]');
+      const elapsed = ((Date.now() - startTime) / 1000 * (i / stepItems.length)).toFixed(1);
+      timeEl.forEach(t => { if(t.style.fontSize==='10px' || t.textContent.match(/[\d.]+s|\.\.\.|-/)) { t.textContent = elapsed + 's'; t.style.color = '#39FF14'; } });
+      const connector = prev.querySelector('div[style*="width:2px"]');
+      if (connector) connector.style.background = '#39FF14';
+    }
+    // Mark current as running
+    if (i < stepItems.length) {
+      const cur = stepItems[i];
+      cur.className = cur.className.replace(/\b(pending|done)\b/g, '').trim() + ' running';
+      const dot = cur.querySelector('.step-dot');
+      if (dot) { dot.style.background = '#39FF14'; dot.style.border = '2px solid #39FF14'; dot.style.animation = 'pulse 1.5s infinite'; }
+      const title = cur.querySelector('[style*="font-size:12px"]');
+      if (title) title.style.color = '#39FF14';
+      const timeEl = cur.querySelectorAll('[style*="font-family"]');
+      timeEl.forEach(t => { if(t.style.fontSize==='10px' || t.textContent.match(/[\d.]+s|\.\.\.|-/)) { t.textContent = '...'; t.style.color = '#39FF14'; } });
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 800);
+
+  return interval;
+}
+
+function completeAllSteps() {
+  const stepItems = document.querySelectorAll('#genStepper .gen-step-item');
+  stepItems.forEach((item, idx) => {
+    item.className = item.className.replace(/\b(pending|running)\b/g, '').trim() + ' done';
+    const dot = item.querySelector('.step-dot');
+    if (dot) { dot.style.background = 'rgba(57,255,20,0.15)'; dot.style.border = '2px solid #39FF14'; dot.style.animation = ''; }
+    const title = item.querySelector('[style*="font-size:12px"]');
+    if (title) title.style.color = '#39FF14';
+    const timeEl = item.querySelectorAll('[style*="font-family"]');
+    const t = (0.8 + idx * 0.7).toFixed(1);
+    timeEl.forEach(el => { if(el.style.fontSize==='10px' || el.textContent.match(/[\d.]+s|\.\.\.|-/)) { el.textContent = t + 's'; el.style.color = '#39FF14'; } });
+    const connector = item.querySelector('div[style*="width:2px"]');
+    if (connector) connector.style.background = '#39FF14';
+  });
+}
+
+function highlightCode(code) {
+  // Simple syntax highlighting
+  let escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Comments
+  escaped = escaped.replace(/(\/\/.*?)(\n|$)/g, '<span class="code-cm">$1</span>$2');
+  escaped = escaped.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="code-cm">$1</span>');
+  escaped = escaped.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="code-cm">$1</span>');
+  // Strings
+  escaped = escaped.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="code-str">$1</span>');
+  escaped = escaped.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="code-str">$1</span>');
+  escaped = escaped.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="code-str">$1</span>');
+  // Keywords
+  escaped = escaped.replace(/\b(const|let|var|function|class|if|else|for|while|return|new|this|true|false|null|undefined|async|await|import|export|default|switch|case|break|continue|try|catch|throw|typeof|instanceof)\b/g, '<span class="code-kw">$1</span>');
+  // Numbers
+  escaped = escaped.replace(/\b(\d+\.?\d*)\b/g, '<span class="code-num">$1</span>');
+  return escaped;
+}
+
+function updateCodeTab(code) {
+  const codeViewer = document.querySelector('#tab-code .code-viewer');
+  if (codeViewer) {
+    codeViewer.innerHTML = highlightCode(code);
+  }
+}
+
+function updateGameDNA(prompt) {
+  const dnaContainer = document.querySelector('#gameDNA .flex');
+  if (!dnaContainer) return;
+  const tags = [];
+  // Detect game type
+  const typeMap = {'贪吃蛇':'贪吃蛇','打砖块':'打砖块','射击':'射击','太空':'太空','跳跃':'平台跳跃','RPG':'RPG','卡牌':'卡牌','解谜':'解谜','塔防':'塔防','赛车':'赛车','翻牌':'记忆','记忆':'记忆','俄罗斯方块':'俄罗斯方块','跑酷':'跑酷','格斗':'格斗','弹球':'弹球','消除':'消除','snake':'贪吃蛇','breakout':'打砖块','shooter':'射击','platformer':'平台跳跃'};
+  for (const [k,v] of Object.entries(typeMap)) {
+    if (prompt.toLowerCase().includes(k.toLowerCase())) { tags.push('类型:'+v); break; }
+  }
+  if (tags.length === 0) tags.push('类型:自定义');
+  // Detect style
+  const styleMap = {'像素':'像素','霓虹':'霓虹','赛博':'赛博朋克','极简':'极简','复古':'复古','水彩':'水彩','暗黑':'暗黑','可爱':'可爱','neon':'霓虹','pixel':'像素','retro':'复古'};
+  for (const [k,v] of Object.entries(styleMap)) {
+    if (prompt.toLowerCase().includes(k.toLowerCase())) { tags.push('风格:'+v); break; }
+  }
+  tags.push('引擎:Canvas2D');
+  tags.push('操控:键盘+触屏');
+  dnaContainer.innerHTML = tags.map(t => `<span style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;border:1px solid rgba(57,255,20,0.4);color:#39FF14;font-size:11px;white-space:nowrap;background:rgba(57,255,20,0.05)">${t}</span>`).join('');
+}
+
+function switchToIframe() {
+  const canvas = document.getElementById('gameCanvas');
+  const iframe = document.getElementById('gameFrame');
+  if (canvas) canvas.style.display = 'none';
+  if (iframe) iframe.style.display = 'block';
+  // Hide game overlays
+  document.getElementById('gameOverlay').style.display = 'none';
+  document.getElementById('gameOverScreen').style.display = 'none';
+  // Stop the built-in game
+  gameRunning = false;
+  hasGenerated = true;
+}
+
+function switchToCanvas() {
+  const canvas = document.getElementById('gameCanvas');
+  const iframe = document.getElementById('gameFrame');
+  if (canvas) canvas.style.display = 'block';
+  if (iframe) iframe.style.display = 'none';
+  hasGenerated = false;
+}
+
+function quickPrompt(text) {
+  const input = document.getElementById('chatInput');
+  input.value = text;
+  sendChat();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text || isGenerating) return;
+  input.value = '';
+  isGenerating = true;
+
+  // Hide sample prompts and hint after first real message
+  const sp = document.getElementById('samplePrompts');
+  if (sp) sp.style.display = 'none';
+  const hint = document.getElementById('chatHint');
+  if (hint) hint.style.display = 'none';
+
+  // Add user message to chat
+  addMsg('user', text);
+
+  // Add to conversation history
+  conversationHistory.push({ role: 'user', text: text });
+
+  // Show typing indicator
+  const c = document.getElementById('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'flex gap-2 items-start';
+  typing.id = 'typingIndicator';
+  typing.innerHTML = `<div class="w-7 h-7 rounded-full bg-neon/20 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">⚛</div>
+    <div class="chat-ai px-4 py-3 max-w-[85%]"><div class="flex gap-1.5"><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div><div class="typing-dot w-1.5 h-1.5 bg-text-secondary rounded-full"></div></div></div>`;
+  c.appendChild(typing); c.scrollTop = c.scrollHeight;
+
+  // Show and animate stepper
+  document.getElementById('genStepper').style.display = 'block';
+  const stepperInterval = animateStepper();
+
+  try {
+    // Call Gemini API
+    const generatedCode = await generateGame(text, conversationHistory);
+    const htmlCode = extractHTML(generatedCode);
+
+    // Stop stepper animation and mark all done
+    if (stepperInterval) clearInterval(stepperInterval);
+    completeAllSteps();
+
+    // Store generated code in history as model response
+    conversationHistory.push({ role: 'model', text: htmlCode });
+    lastGeneratedCode = htmlCode;
+
+    // Switch to iframe and inject code
+    switchToIframe();
+    const iframe = document.getElementById('gameFrame');
+    if (iframe) iframe.srcdoc = htmlCode;
+
+    // Remove typing indicator
+    const ti = document.getElementById('typingIndicator');
+    if (ti) ti.remove();
+
+    // Show success message in chat
+    const isModification = conversationHistory.filter(m => m.role === 'user').length > 1;
+    const chatReply = isModification
+      ? `✅ 已更新！根据你的要求修改了游戏。试试看效果吧 👆`
+      : `🎮 游戏已生成！点击预览区域开始游戏。\n\n想修改什么随时告诉我，比如"加个Boss"、"换个颜色"。`;
+    addMsg('ai', chatReply);
+
+    // Update code tab
+    updateCodeTab(htmlCode);
+
+    // Update DNA tags
+    updateGameDNA(text);
+    document.getElementById('gameDNA').style.display = 'flex';
+
+  } catch (err) {
+    // Stop stepper
+    if (stepperInterval) clearInterval(stepperInterval);
+
+    // Remove typing indicator
+    const ti = document.getElementById('typingIndicator');
+    if (ti) ti.remove();
+
+    // Remove the failed user message from history
+    conversationHistory.pop();
+
+    // Show error in chat
+    const is403 = err.message.includes('403') || err.message.includes('API Key') || err.message.includes('key');
+    if (is403) {
+      addMsg('ai', `⚠️ API Key 无效或已过期。请点击右上角 ⚙️ 设置新的 Gemini API Key。\n\n获取方式：访问 aistudio.google.com → Get API Key → 复制粘贴到这里。`);
+    } else {
+      addMsg('ai', `⚠️ 生成失败：${err.message}\n\n请重试，或换个描述试试。`);
+    }
+    console.error('Generation error:', err);
+  }
+
+  isGenerating = false;
+}
+
+// ===== SPACE SHOOTER GAME (ENHANCED) =====
+let gameRunning=false, gameFrame=null;
+let ship={x:0,y:0,w:28,h:24};
+let gameStars=[], asteroids=[], bullets=[], enemies=[], particles=[], powerups=[];
+let keys={}, score=0, lives=5, wave=1, waveTimer=0, waveFrameCount=0, gameOver=false;
+let touchTgt=null, shootCooldown=0;
+let shieldActive=false, shieldTimer=0, rapidActive=false, rapidTimer=0;
+let screenShakeFrames=0, highScore=0;
+let activePowerupIcon='', activePowerupTimer=0;
+
+function loadHighScore() { try { highScore = parseInt(localStorage.getItem('vibeplay_highscore'))||0; } catch(e){} }
+function saveHighScore() { try { localStorage.setItem('vibeplay_highscore', highScore); } catch(e){} }
+
+function initGame() {
+  const canvas = document.getElementById('gameCanvas');
+  if(!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width; canvas.height = rect.height;
+  ship.x = canvas.width/2; ship.y = canvas.height*.78;
+  gameStars = Array.from({length:80}, () => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, sp:Math.random()*2+.5, s:Math.random()*1.5+.5, b:Math.random()}));
+  asteroids=[]; enemies=[]; bullets=[]; particles=[]; powerups=[];
+  score=0; lives=5; wave=1; waveTimer=0; waveFrameCount=0; gameOver=false;
+  shieldActive=false; shieldTimer=0; rapidActive=false; rapidTimer=0;
+  screenShakeFrames=0; activePowerupIcon=''; activePowerupTimer=0;
+  shootCooldown=0;
+  loadHighScore();
+  document.getElementById('gameOverScreen').style.display='none';
+  document.getElementById('gameOverlay').style.display='none';
+  for(let i=0;i<3;i++) spawnAsteroid(canvas);
+  spawnWave(canvas);
+
+  document.onkeydown = e => { keys[e.key]=true; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault(); };
+  document.onkeyup = e => keys[e.key]=false;
+  canvas.ontouchstart = canvas.ontouchmove = e => { e.preventDefault(); const r=canvas.getBoundingClientRect(), t=e.touches[0]; touchTgt={x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)}; };
+  canvas.ontouchend = () => touchTgt=null;
+
+  gameRunning=true;
+  if(gameFrame) cancelAnimationFrame(gameFrame);
+  gameLoop(canvas);
+}
+
+function spawnAsteroid(c) {
+  const n = 6+Math.floor(Math.random()*4);
+  const verts = Array.from({length:n}, (_,i) => ({a:(i/n)*Math.PI*2, r:.65+Math.random()*.35}));
+  asteroids.push({x:Math.random()*c.width, y:-30-Math.random()*100, size:Math.random()*18+10, sp:Math.random()*1.5+.8+wave*0.1, rot:0, rs:(Math.random()-.5)*.04, verts});
+}
+
+function spawnWave(c) {
+  const count = 3 + wave * 2;
+  for(let i=0;i<count;i++) {
+    // Mini-boss every 50 points: check score threshold; also boss at wave >= 3
+    const isBoss = (wave >= 3 && i===0);
+    const isMiniBoss = (!isBoss && score > 0 && score % 50 < 10 && i===1 && wave >= 2);
+    const type = isBoss ? 'boss' : isMiniBoss ? 'miniboss' : Math.random()>.5 ? 'tracker' : 'patrol';
+    enemies.push({
+      x: Math.random()*(c.width-80)+40,
+      y: -40 - i*50,
+      type,
+      hp: type==='boss'?15:type==='miniboss'?3:type==='tracker'?2:1,
+      maxHp: type==='boss'?15:type==='miniboss'?3:type==='tracker'?2:1,
+      w: type==='boss'?40:type==='miniboss'?28:20,
+      h: type==='boss'?36:type==='miniboss'?24:16,
+      sp: (type==='tracker'?1.8:type==='boss'?0.6:type==='miniboss'?1.0:1.2) + wave*0.08,
+      shootTimer: Math.random()*120,
+      phase: Math.random()*Math.PI*2,
+    });
+  }
+}
+
+function spawnParticle(x,y,color,count=8) {
+  for(let i=0;i<count;i++) {
+    const angle = Math.random()*Math.PI*2;
+    const speed = Math.random()*3.5+1;
+    particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,color,size:Math.random()*3+1});
+  }
+}
+
+function triggerScreenShake() { screenShakeFrames = 8; }
+
+function flashPowerup(color) {
+  const overlay = document.getElementById('powerFlashOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'block';
+  overlay.style.background = color;
+  overlay.style.opacity = '0.3';
+  overlay.style.transition = 'opacity 0.3s ease-out';
+  setTimeout(() => { overlay.style.opacity = '0'; }, 50);
+  setTimeout(() => { overlay.style.display = 'none'; }, 350);
+}
+
+function spawnPowerup(x,y) {
+  if(Math.random()>.65) return;
+  const types = ['shield','rapid','life'];
+  powerups.push({x,y,type:types[Math.floor(Math.random()*types.length)],sp:1.5,pulse:0});
+}
+
+function drawShip(ctx,x,y) {
+  ctx.save();
+  // Shield aura
+  if(shieldActive) {
+    ctx.strokeStyle=`rgba(69,183,209,${0.4+Math.sin(Date.now()*0.01)*0.2})`;
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(x,y,22,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle=`rgba(69,183,209,0.08)`;
+    ctx.beginPath(); ctx.arc(x,y,22,0,Math.PI*2); ctx.fill();
+  }
+  // Engine flames (more detailed)
+  const fl = 8+Math.random()*8;
+  const fl2 = 4+Math.random()*5;
+  // Outer flame
+  ctx.fillStyle=`rgba(57,255,20,${.35+Math.random()*.25})`;
+  ctx.beginPath(); ctx.moveTo(x-6,y+12); ctx.lineTo(x,y+12+fl); ctx.lineTo(x+6,y+12); ctx.fill();
+  // Inner flame
+  ctx.fillStyle=`rgba(200,255,100,${.3+Math.random()*.3})`;
+  ctx.beginPath(); ctx.moveTo(x-3,y+12); ctx.lineTo(x,y+12+fl*.6); ctx.lineTo(x+3,y+12); ctx.fill();
+  // Side thrusters
+  ctx.fillStyle=`rgba(57,255,20,${.2+Math.random()*.2})`;
+  ctx.beginPath(); ctx.moveTo(x-12,y+10); ctx.lineTo(x-13,y+10+fl2); ctx.lineTo(x-10,y+10); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x+10,y+10); ctx.lineTo(x+13,y+10+fl2); ctx.lineTo(x+12,y+10); ctx.fill();
+  // Body
+  ctx.fillStyle = rapidActive ? '#FBBF24' : '#39FF14';
+  ctx.beginPath();
+  ctx.moveTo(x, y-14);
+  ctx.lineTo(x-6, y-4);
+  ctx.lineTo(x-14, y+12);
+  ctx.lineTo(x-4, y+8);
+  ctx.lineTo(x+4, y+8);
+  ctx.lineTo(x+14, y+12);
+  ctx.lineTo(x+6, y-4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle= rapidActive ? '#e6a800' : '#2bcc10'; ctx.lineWidth=1; ctx.stroke();
+  // Cockpit
+  ctx.fillStyle='#0F0F14';
+  ctx.beginPath(); ctx.arc(x, y-2, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle= rapidActive ? 'rgba(251,191,36,0.4)' : 'rgba(57,255,20,0.3)';
+  ctx.beginPath(); ctx.arc(x, y-2, 2, 0, Math.PI*2); ctx.fill();
+  // Wings detail
+  ctx.fillStyle= rapidActive ? '#e6a800' : '#2bcc10';
+  ctx.fillRect(x-12, y+6, 8, 2);
+  ctx.fillRect(x+4, y+6, 8, 2);
+  ctx.restore();
+}
+
+function drawEnemy(ctx,e) {
+  ctx.save();
+  ctx.translate(e.x, e.y);
+  if(e.type==='boss') {
+    ctx.fillStyle='#ff3366';
+    ctx.beginPath();
+    ctx.moveTo(0,-18); ctx.lineTo(-20,-6); ctx.lineTo(-18,14); ctx.lineTo(-6,10);
+    ctx.lineTo(0,18); ctx.lineTo(6,10); ctx.lineTo(18,14); ctx.lineTo(20,-6); ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle='#ff1144'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='#FFD700';
+    ctx.beginPath(); ctx.arc(-6,-2,3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(6,-2,3,0,Math.PI*2); ctx.fill();
+    // HP bar
+    ctx.fillStyle='rgba(255,255,255,0.1)';
+    ctx.fillRect(-20,-26,40,4);
+    ctx.fillStyle='#ff3366';
+    ctx.fillRect(-20,-26,40*(e.hp/e.maxHp),4);
+  } else if(e.type==='miniboss') {
+    // Green mini-boss
+    ctx.fillStyle='#34D399';
+    ctx.beginPath();
+    ctx.moveTo(0,-14); ctx.lineTo(-14,-2); ctx.lineTo(-12,10); ctx.lineTo(-4,8);
+    ctx.lineTo(0,14); ctx.lineTo(4,8); ctx.lineTo(12,10); ctx.lineTo(14,-2); ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle='#2bcc10'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='#FFD700';
+    ctx.beginPath(); ctx.arc(0,-2,2.5,0,Math.PI*2); ctx.fill();
+    // HP bar
+    ctx.fillStyle='rgba(255,255,255,0.1)';
+    ctx.fillRect(-14,-20,28,3);
+    ctx.fillStyle='#34D399';
+    ctx.fillRect(-14,-20,28*(e.hp/e.maxHp),3);
+  } else if(e.type==='tracker') {
+    ctx.fillStyle='#ff7744';
+    ctx.beginPath();
+    ctx.moveTo(0,-10); ctx.lineTo(-12,8); ctx.lineTo(0,4); ctx.lineTo(12,8); ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle='#FFD700';
+    ctx.beginPath(); ctx.arc(0,-2,2,0,Math.PI*2); ctx.fill();
+  } else {
+    // Red enemy ship that moves side-to-side
+    ctx.fillStyle='#ff5555';
+    ctx.beginPath();
+    ctx.moveTo(0,-8); ctx.lineTo(-10,6); ctx.lineTo(10,6); ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle='rgba(255,100,100,0.5)';
+    ctx.beginPath(); ctx.arc(0,0,2,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function gameLoop(canvas) {
+  if(!gameRunning) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Screen shake
+  ctx.save();
+  if(screenShakeFrames > 0) {
+    const shakeX = (Math.random()-0.5)*screenShakeFrames;
+    const shakeY = (Math.random()-0.5)*screenShakeFrames;
+    ctx.translate(shakeX, shakeY);
+    screenShakeFrames--;
+  }
+
+  ctx.clearRect(-10,-10,W+20,H+20);
+
+  // Stars
+  gameStars.forEach(s => {
+    s.y += s.sp;
+    if(s.y>H){s.y=0;s.x=Math.random()*W;}
+    const f = .4+Math.sin(Date.now()*.003+s.b*100)*.2;
+    ctx.fillStyle=`rgba(240,237,230,${f})`;
+    ctx.fillRect(s.x, s.y, s.s, s.s);
+  });
+
+  // Timers
+  if(!gameOver) {
+    waveFrameCount++;
+    if(waveFrameCount >= 1800) { // 30 seconds at 60fps
+      wave++;
+      waveFrameCount = 0;
+      spawnWave(canvas);
+      playNote(523,.1); setTimeout(()=>playNote(659,.1),100); setTimeout(()=>playNote(784,.15),200);
+    }
+    if(shieldActive) { shieldTimer--; if(shieldTimer<=0) shieldActive=false; }
+    if(rapidActive) { rapidTimer--; if(rapidTimer<=0) rapidActive=false; }
+    if(activePowerupTimer > 0) activePowerupTimer--;
+  }
+
+  if(!gameOver) {
+    const spd=5;
+    if(keys.ArrowLeft||keys.a)ship.x-=spd;
+    if(keys.ArrowRight||keys.d)ship.x+=spd;
+    if(keys.ArrowUp||keys.w)ship.y-=spd;
+    if(keys.ArrowDown||keys.s)ship.y+=spd;
+    shootCooldown--;
+    const fireCooldown = rapidActive ? 3 : 8;
+    if(keys[' '] && shootCooldown<=0) {
+      if(rapidActive) {
+        bullets.push({x:ship.x-6,y:ship.y-14,sp:10},{x:ship.x,y:ship.y-16,sp:11},{x:ship.x+6,y:ship.y-14,sp:10});
+      } else {
+        bullets.push({x:ship.x-4,y:ship.y-14,sp:9},{x:ship.x+4,y:ship.y-14,sp:9});
+      }
+      shootCooldown=fireCooldown;
+      playNote(1200,.03,'square',.02);
+    }
+    if(touchTgt) {
+      const dx=touchTgt.x-ship.x, dy=touchTgt.y-ship.y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d>3){ship.x+=dx/d*spd;ship.y+=dy/d*spd;}
+      if(shootCooldown<=0){bullets.push({x:ship.x,y:ship.y-14,sp:9});shootCooldown=rapidActive?4:10;}
+    }
+    ship.x=Math.max(16,Math.min(W-16,ship.x));
+    ship.y=Math.max(20,Math.min(H-20,ship.y));
+    drawShip(ctx, ship.x, ship.y);
+  }
+
+  // Player bullets
+  for(let i=bullets.length-1;i>=0;i--) {
+    const b=bullets[i];
+    if(b.enemy) continue;
+    b.y-=b.sp;
+    if(b.y<-10){bullets.splice(i,1);continue;}
+    ctx.fillStyle= rapidActive ? '#FBBF24' : '#39FF14';
+    ctx.shadowColor= rapidActive ? '#FBBF24' : '#39FF14'; ctx.shadowBlur=6;
+    ctx.fillRect(b.x-1.5,b.y-5,3,10);
+    ctx.shadowBlur=0;
+  }
+
+  // Enemy shoot logic
+  if(!gameOver) {
+    enemies.forEach(e => {
+      if(e.y < 0) return;
+      e.shootTimer--;
+      if(e.shootTimer<=0 && e.y>0 && e.y<H*.7) {
+        const angle = Math.atan2(ship.y-e.y, ship.x-e.x);
+        bullets.push({x:e.x,y:e.y+e.h/2,sp:-4,vx:Math.cos(angle)*3,vy:Math.sin(angle)*3,enemy:true});
+        e.shootTimer = e.type==='boss'?30:e.type==='miniboss'?50:70+Math.random()*40;
+      }
+    });
+  }
+
+  // Enemy bullets update
+  for(let i=bullets.length-1;i>=0;i--) {
+    const b=bullets[i];
+    if(!b.enemy) continue;
+    if(b.vx!==undefined){b.x+=b.vx;b.y+=b.vy;}
+    else b.y-=b.sp;
+    if(b.y>H+10||b.y<-10||b.x<-10||b.x>W+10){bullets.splice(i,1);continue;}
+    ctx.fillStyle='#ff5555';
+    ctx.shadowColor='#ff5555'; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(b.x,b.y,3,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // Hit player
+    if(!gameOver && !shieldActive && Math.abs(b.x-ship.x)<14 && Math.abs(b.y-ship.y)<14) {
+      bullets.splice(i,1);
+      lives--;
+      spawnParticle(ship.x,ship.y,'#ff5555',10);
+      triggerScreenShake();
+      playNote(200,.1,'sawtooth',.05);
+      if(lives<=0) triggerGameOver();
+    }
+  }
+
+  // Asteroids
+  for(let i=asteroids.length-1;i>=0;i--) {
+    const a=asteroids[i];
+    a.y+=a.sp; a.rot+=a.rs;
+    if(a.y>H+40){a.y=-40;a.x=Math.random()*W;}
+    for(let j=bullets.length-1;j>=0;j--) {
+      const b=bullets[j];
+      if(b.enemy) continue;
+      if(Math.abs(a.x-b.x)<a.size && Math.abs(a.y-b.y)<a.size) {
+        bullets.splice(j,1); score+=10;
+        spawnParticle(a.x,a.y,'#888',6);
+        if(a.size>12){a.size*=.7;a.sp+=.3;}
+        else{asteroids.splice(i,1);spawnAsteroid(canvas);spawnPowerup(a.x,a.y);}
+        playNote(200,.04);
+        break;
+      }
+    }
+    ctx.save(); ctx.translate(a.x,a.y); ctx.rotate(a.rot);
+    ctx.beginPath();
+    a.verts.forEach((v,vi) => {
+      const px=Math.cos(v.a)*a.size*v.r, py=Math.sin(v.a)*a.size*v.r;
+      vi===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    });
+    ctx.closePath();
+    ctx.fillStyle='#1e1e2a'; ctx.fill();
+    ctx.strokeStyle='#444'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.restore();
+    if(!gameOver && !shieldActive && Math.abs(a.x-ship.x)<a.size*.7 && Math.abs(a.y-ship.y)<a.size*.7) {
+      lives--; spawnParticle(ship.x,ship.y,'#ff5555',10);
+      a.y=-40; a.x=Math.random()*W;
+      triggerScreenShake();
+      playNote(150,.12,'sawtooth',.05);
+      if(lives<=0) triggerGameOver();
+    }
+  }
+  while(asteroids.length<3+wave) spawnAsteroid(canvas);
+
+  // Enemies
+  for(let i=enemies.length-1;i>=0;i--) {
+    const e=enemies[i];
+    e.phase += .02;
+    if(e.type==='patrol') {
+      e.y += e.sp;
+      e.x += Math.sin(e.phase)*2; // side-to-side
+    } else if(e.type==='tracker') {
+      const dx=ship.x-e.x, dy=ship.y-e.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+      e.x += dx/d*e.sp*.5;
+      e.y += e.sp;
+    } else if(e.type==='miniboss') {
+      e.y = Math.min(e.y+e.sp, 120);
+      e.x += Math.sin(e.phase)*2.5;
+    } else { // boss
+      e.y = Math.min(e.y+e.sp, 80);
+      e.x += Math.sin(e.phase)*2;
+    }
+    if(e.y > H+50 && e.type!=='boss' && e.type!=='miniboss'){enemies.splice(i,1);continue;}
+
+    for(let j=bullets.length-1;j>=0;j--) {
+      const b=bullets[j];
+      if(b.enemy) continue;
+      if(Math.abs(e.x-b.x)<e.w*.6 && Math.abs(e.y-b.y)<e.h*.6) {
+        bullets.splice(j,1);
+        e.hp--;
+        spawnParticle(b.x,b.y,e.type==='boss'?'#ff3366':e.type==='miniboss'?'#34D399':'#ff7744',4);
+        if(e.hp<=0) {
+          score += e.type==='boss'?200:e.type==='miniboss'?100:e.type==='tracker'?50:30;
+          spawnParticle(e.x,e.y,e.type==='boss'?'#ff3366':e.type==='miniboss'?'#34D399':'#ff5555',e.type==='boss'?20:12);
+          spawnPowerup(e.x,e.y);
+          enemies.splice(i,1);
+          playNote(300,.08,'square',.04);
+          const mel = (e.type==='boss'||e.type==='miniboss')?[[400,.08],[500,.08],[600,.12]]:[[800,.04]];
+          mel.forEach(([f,d],k) => setTimeout(()=>playNote(f,d),k*80));
+        } else {
+          playNote(400,.03);
+        }
+        break;
+      }
+    }
+    drawEnemy(ctx,e);
+    if(!gameOver && !shieldActive && Math.abs(e.x-ship.x)<(e.w+ship.w)*.35 && Math.abs(e.y-ship.y)<(e.h+ship.h)*.35) {
+      lives--; spawnParticle(ship.x,ship.y,'#ff5555',10);
+      triggerScreenShake();
+      playNote(150,.12,'sawtooth',.05);
+      if(e.type!=='boss' && e.type!=='miniboss'){enemies.splice(i,1);}
+      if(lives<=0) triggerGameOver();
+    }
+  }
+
+  // Spawn more enemies if wave is empty and timer based
+  if(enemies.length===0 && !gameOver) {
+    waveTimer++;
+    if(waveTimer>60) {
+      wave++;
+      waveTimer=0;
+      waveFrameCount = 0;
+      spawnWave(canvas);
+      playNote(523,.1); setTimeout(()=>playNote(659,.1),100); setTimeout(()=>playNote(784,.15),200);
+    }
+  }
+
+  // Powerups
+  for(let i=powerups.length-1;i>=0;i--) {
+    const p=powerups[i];
+    p.y += p.sp; p.pulse += .05;
+    if(p.y>H+20){powerups.splice(i,1);continue;}
+    const glow = .5+Math.sin(p.pulse)*.3;
+    const colors = {shield:'#45B7D1',rapid:'#FBBF24',life:'#FF6B6B'};
+    const icons = {shield:'🛡',rapid:'⚡',life:'♥'};
+    ctx.fillStyle=`rgba(${p.type==='shield'?'69,183,209':p.type==='rapid'?'251,191,36':'255,107,107'},${glow*.3})`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,14,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=colors[p.type]; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(p.x,p.y,10,0,Math.PI*2); ctx.stroke();
+    ctx.font='12px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff'; ctx.fillText(icons[p.type],p.x,p.y);
+    if(!gameOver && Math.abs(p.x-ship.x)<18 && Math.abs(p.y-ship.y)<18) {
+      powerups.splice(i,1);
+      if(p.type==='life' && lives<5) { lives++; activePowerupIcon='❤️'; activePowerupTimer=120; }
+      else if(p.type==='shield') { shieldActive=true; shieldTimer=180; activePowerupIcon='🛡️'; activePowerupTimer=180; } // 3 sec
+      else if(p.type==='rapid') { rapidActive=true; rapidTimer=300; activePowerupIcon='⚡'; activePowerupTimer=300; } // 5 sec
+      score += 25;
+      spawnParticle(p.x,p.y,colors[p.type],8);
+      flashPowerup(colors[p.type]+'40');
+      playNote(988,.08,'sine',.04);
+      setTimeout(()=>playNote(1175,.06,'sine',.03),80);
+    }
+  }
+
+  // Particles
+  for(let i=particles.length-1;i>=0;i--) {
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.life-=.025; p.vx*=.96; p.vy*=.96;
+    if(p.life<=0){particles.splice(i,1);continue;}
+    ctx.globalAlpha=p.life;
+    ctx.fillStyle=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  // === HUD ===
+  // Score top-left
+  ctx.fillStyle='#39FF14'; ctx.font='bold 14px "JetBrains Mono",monospace'; ctx.textAlign='left';
+  ctx.fillText(`SCORE  ${score}`, 16, 28);
+  // Active power-up indicator
+  if(activePowerupTimer > 0) {
+    ctx.font='16px serif';
+    ctx.fillText(activePowerupIcon, 16, 50);
+    // Small timer bar
+    const barW = 30;
+    const barPct = activePowerupTimer / (activePowerupIcon==='⚡'?300:180);
+    ctx.fillStyle='rgba(57,255,20,0.2)';
+    ctx.fillRect(36, 42, barW, 4);
+    ctx.fillStyle='#39FF14';
+    ctx.fillRect(36, 42, barW*barPct, 4);
+  }
+  // Wave top-center
+  ctx.fillStyle='#39FF14'; ctx.font='bold 13px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  ctx.fillText(`WAVE ${wave}`, W/2, 28);
+  // Lives top-right as hearts
+  ctx.font='16px serif'; ctx.textAlign='right';
+  for(let i=0;i<5;i++) {
+    ctx.fillStyle = i<lives ? '#FF6B6B' : 'rgba(255,107,107,0.15)';
+    ctx.fillText('❤️', W-12-i*22, 28);
+  }
+  // Controls hint
+  if(!gameOver) {
+    ctx.fillStyle='rgba(136,136,136,0.3)'; ctx.font='10px "JetBrains Mono",monospace'; ctx.textAlign='center';
+    ctx.fillText('WASD/方向键 移动 · 空格 射击', W/2, H-12);
+  }
+
+  ctx.restore(); // end screen shake transform
+
+  gameFrame = requestAnimationFrame(() => gameLoop(canvas));
+}
+
+function triggerGameOver() {
+  gameOver = true;
+  if(score > highScore) { highScore = score; saveHighScore(); }
+  document.getElementById('finalScore').textContent = score;
+  const hsEl = document.getElementById('highScoreDisplay');
+  if(hsEl) hsEl.textContent = score >= highScore ? '🏆 新纪录!' : `最高分: ${highScore}`;
+  setTimeout(() => {
+    document.getElementById('gameOverScreen').style.display = 'flex';
+  }, 500);
+  playNote(200,.15,'sawtooth',.06);
+  setTimeout(()=>playNote(150,.2,'sawtooth',.05),150);
+  setTimeout(()=>playNote(100,.3,'sawtooth',.04),300);
+}
+
+function toggleGame(play) {
+  if (hasGenerated) {
+    // For generated games, reload the iframe
+    if (play) {
+      const iframe = document.getElementById('gameFrame');
+      if (iframe && lastGeneratedCode) iframe.srcdoc = lastGeneratedCode;
+    }
+    playNote(play?880:440,.08);
+    return;
+  }
+  if(play) {
+    if(!gameRunning){gameRunning=true;document.getElementById('gameOverlay').style.display='none';gameLoop(document.getElementById('gameCanvas'));}
+  } else {
+    gameRunning=false;document.getElementById('gameOverlay').style.display='flex';
+  }
+  playNote(play?880:440,.08);
+}
+
+function resetGame() {
+  gameRunning=false;
+  if(gameFrame)cancelAnimationFrame(gameFrame);
+  chatInited=false;
+  conversationHistory = [];
+  lastGeneratedCode = '';
+  isGenerating = false;
+  switchToCanvas();
+  // Show sample prompts again
+  const sp = document.getElementById('samplePrompts');
+  if (sp) sp.style.display = 'flex';
+  const hint = document.getElementById('chatHint');
+  if (hint) hint.style.display = 'block';
+  setTimeout(()=>{initGame();initChat();},100);
+  playMelody('start');
+}
+
+// Resize
+addEventListener('resize', () => {
+  if(document.getElementById('page-builder').classList.contains('active')) {
+    const c=document.getElementById('gameCanvas'), r=c.parentElement.getBoundingClientRect();
+    c.width=r.width; c.height=r.height;
+  }
+});
+
+// Init on load
+renderHotGames();
+</script>
+</body>
+</html>
